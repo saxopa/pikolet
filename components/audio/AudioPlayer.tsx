@@ -1,6 +1,5 @@
-import { View, Text, TouchableOpacity, Linking } from "react-native";
+import { View, Text, TouchableOpacity, Linking, Platform } from "react-native";
 import { useState, useEffect, useRef } from "react";
-import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { Waveform } from "./Waveform";
 
@@ -20,14 +19,20 @@ function formatDuration(s: number) {
 export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const sound = useRef<Audio.Sound | null>(null);
+  // expo-av chargé dynamiquement — non disponible sur web
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sound = useRef<any>(null);
 
   useEffect(() => () => { sound.current?.unloadAsync(); }, []);
 
   async function toggle() {
-    if (youtubeUrl) { Linking.openURL(youtubeUrl); return; }
+    if (youtubeUrl || Platform.OS === "web") {
+      if (youtubeUrl) Linking.openURL(youtubeUrl);
+      return;
+    }
     if (!url) return;
     if (!sound.current) {
+      const { Audio } = await import("expo-av");
       const { sound: s } = await Audio.Sound.createAsync({ uri: url }, {}, (status) => {
         if (status.isLoaded && status.durationMillis) {
           setProgress(status.positionMillis / status.durationMillis);
@@ -36,11 +41,11 @@ export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
       });
       sound.current = s;
     }
-    if (playing) { await sound.current.pauseAsync(); setPlaying(false); }
-    else { await sound.current.playAsync(); setPlaying(true); }
+    if (playing) { await sound.current?.pauseAsync(); setPlaying(false); }
+    else { await sound.current?.playAsync(); setPlaying(true); }
   }
 
-  const isYt = !!youtubeUrl;
+  const isYt = !!youtubeUrl || Platform.OS === "web";
 
   return (
     <View className="bg-gray-50 rounded-xl px-3 py-2.5 flex-row items-center gap-2.5 mb-2">

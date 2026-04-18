@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import { Avatar } from "../ui/Avatar";
 import { AudioPlayer } from "../audio/AudioPlayer";
 import type { FeedPost } from "../../hooks/useFeed";
@@ -20,12 +21,15 @@ function timeAgo(date: string) {
 export function PostCard({ post, userId, onLike, onComment }: Props) {
   const liked = post.post_likes.some(l => l.user_id === userId);
   const species = post.post_songs[0]?.song?.bird?.species;
+  const router = useRouter();
 
   return (
     <View className="bg-white border border-gray-100 rounded-2xl mb-3 overflow-hidden">
       {/* Header */}
       <View className="flex-row items-center gap-2.5 px-3.5 pt-3 pb-2">
-        <Avatar uri={post.author.avatar_url} name={post.author.display_name ?? post.author.username} size={36} />
+        <TouchableOpacity onPress={() => router.push(`/profile/${post.author.username}`)}>
+          <Avatar uri={post.author.avatar_url} name={post.author.display_name ?? post.author.username} size={36} />
+        </TouchableOpacity>
         <View className="flex-1">
           <Text className="text-[13px] font-medium text-gray-900">
             {post.author.display_name ?? post.author.username}
