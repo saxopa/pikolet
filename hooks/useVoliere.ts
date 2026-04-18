@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getMyBirds, getBird, getBirdLogs, getMySongs } from "../lib/supabase";
+import { getMyBirds, getBird, getBirdLogs, getBirdSongs } from "../lib/supabase";
 import type { Bird, BirdLog, BirdSong } from "../types";
 
 export function useVoliere(ownerId?: string) {
@@ -31,7 +31,7 @@ export function useBirdDetail(birdId: string) {
       const [birdRes, logsRes, songsRes] = await Promise.all([
         getBird(birdId),
         getBirdLogs(birdId),
-        getMySongs(birdId),
+        getBirdSongs(birdId),
       ]);
       if (birdRes.data) setBird(birdRes.data as unknown as Bird);
       if (logsRes.data) setLogs(logsRes.data as BirdLog[]);

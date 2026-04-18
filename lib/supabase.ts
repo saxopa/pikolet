@@ -99,6 +99,13 @@ export const getBirdLogs = (birdId: string) =>
 export const addBirdLog = (log: Omit<BirdLog, "id">) =>
   supabase.from("bird_logs").insert(log);
 
+export const getBirdSongs = (birdId: string) =>
+  supabase
+    .from("bird_songs")
+    .select("*")
+    .eq("bird_id", birdId)
+    .order("created_at", { ascending: false });
+
 // ─── Chants ─────────────────────────────────────────────────────────────────
 
 export const getPublicSongs = (species?: string) => {

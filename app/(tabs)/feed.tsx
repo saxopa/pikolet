@@ -1,4 +1,5 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import { useRouter } from "expo-router";
 import { useFeed } from "../../hooks/useFeed";
 import { useAuth } from "../../hooks/useAuth";
 import { PostCard } from "../../components/feed/PostCard";
@@ -7,6 +8,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 export default function FeedScreen() {
   const { user } = useAuth();
   const { posts, loading, refreshing, refresh, like } = useFeed(user?.id);
+  const router = useRouter();
 
   return (
     <View className="flex-1 bg-white">
@@ -16,9 +18,19 @@ export default function FeedScreen() {
           <Text className="text-[22px] font-medium text-gray-900">Pikolèt</Text>
           <Text className="text-[13px] text-gray-400">Communauté Guyane</Text>
         </View>
-        <TouchableOpacity className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center">
-          <Text className="text-base">🔔</Text>
-        </TouchableOpacity>
+        <View className="flex-row gap-2">
+          <TouchableOpacity className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center">
+            <Text className="text-base">🔔</Text>
+          </TouchableOpacity>
+          {user && (
+            <TouchableOpacity
+              onPress={() => router.push("/post/new")}
+              className="w-8 h-8 rounded-full bg-accent items-center justify-center"
+            >
+              <Text className="text-white text-xl font-light">+</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <FlatList
