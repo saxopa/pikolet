@@ -1,14 +1,17 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useFeed } from "../../hooks/useFeed";
 import { useAuth } from "../../hooks/useAuth";
 import { PostCard } from "../../components/feed/PostCard";
+import { CommentsSheet } from "../../components/feed/CommentsSheet";
 import { EmptyState } from "../../components/ui/EmptyState";
 
 export default function FeedScreen() {
   const { user } = useAuth();
   const { posts, loading, refreshing, refresh, like } = useFeed(user?.id);
   const router = useRouter();
+  const [commentPostId, setCommentPostId] = useState<string | null>(null);
 
   return (
     <View className="flex-1 bg-white">
@@ -52,9 +55,16 @@ export default function FeedScreen() {
             post={item}
             userId={user?.id}
             onLike={() => like(item.id)}
-            onComment={() => {}}
+            onComment={() => setCommentPostId(item.id)}
           />
         )}
+      />
+
+      <CommentsSheet
+        postId={commentPostId ?? ""}
+        userId={user?.id}
+        visible={!!commentPostId}
+        onClose={() => setCommentPostId(null)}
       />
     </View>
   );

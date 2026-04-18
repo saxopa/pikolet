@@ -32,6 +32,7 @@ export default function RootLayout() {
       <Stack.Screen name="bird/new" options={{ title: "Nouvel oiseau", headerBackTitle: "" }} />
       <Stack.Screen name="bird/[id]/log" options={{ title: "Journal", headerBackTitle: "" }} />
       <Stack.Screen name="post/new" options={{ title: "Nouveau post", headerBackTitle: "" }} />
+      <Stack.Screen name="chant/new" options={{ title: "Nouveau chant", headerBackTitle: "" }} />
     </Stack>
   );
 }

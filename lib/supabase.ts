@@ -1,7 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../types/database";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRecord = Record<string, any>;
 import type { Post, Bird, BirdSong, Profile, BirdLog } from "../types";
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL!;

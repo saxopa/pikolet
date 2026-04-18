@@ -1,5 +1,7 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import { useRouter } from "expo-router";
 import { useChants } from "../../hooks/useChants";
+import { useAuth } from "../../hooks/useAuth";
 import { SongCard } from "../../components/feed/SongCard";
 import { EmptyState } from "../../components/ui/EmptyState";
 
@@ -11,6 +13,8 @@ const TABS = [
 
 export default function ChantsScreen() {
   const { songs, filter, setFilter, loading, refresh } = useChants();
+  const { user } = useAuth();
+  const router = useRouter();
 
   return (
     <View className="flex-1 bg-white">
@@ -19,6 +23,14 @@ export default function ChantsScreen() {
           <Text className="text-[22px] font-medium text-gray-900">Bibliothèque</Text>
           <Text className="text-[13px] text-gray-400">Chants partagés</Text>
         </View>
+        {user && (
+          <TouchableOpacity
+            onPress={() => router.push("/chant/new")}
+            className="w-8 h-8 rounded-full bg-accent items-center justify-center"
+          >
+            <Text className="text-white text-xl font-light">+</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Filtres */}
