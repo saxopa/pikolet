@@ -14,8 +14,17 @@ export const supabase = createClient<Database>(url, key, {
 export const signInWithEmail = (email: string, password: string) =>
   supabase.auth.signInWithPassword({ email, password });
 
-export const signUpWithEmail = (email: string, password: string) =>
-  supabase.auth.signUp({ email, password });
+// username/location passés en metadata → trigger handle_new_user crée le profil
+export const signUpWithEmail = (
+  email: string,
+  password: string,
+  meta: { username: string; location?: string }
+) =>
+  supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { username: meta.username, location: meta.location ?? null } },
+  });
 
 export const signOut = () => supabase.auth.signOut();
 

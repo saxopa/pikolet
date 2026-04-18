@@ -1,7 +1,16 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  View, Text, TextInput, TouchableOpacity, Alert,
+  KeyboardAvoidingView, Platform,
+} from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { signInWithEmail } from "../../lib/supabase";
+
+const ERROR_MAP: Record<string, string> = {
+  "Invalid login credentials": "Email ou mot de passe incorrect.",
+  "Email not confirmed": "Confirme ton email avant de te connecter.",
+  "Too many requests": "Trop de tentatives. Attends quelques minutes.",
+};
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -10,19 +19,29 @@ export default function LoginScreen() {
   const router = useRouter();
 
   async function handleLogin() {
-    if (!email || !password) { Alert.alert("Champs requis", "Remplis l'email et le mot de passe."); return; }
+    if (!email.trim() || !password) {
+      Alert.alert("Champs requis", "Remplis l'email et le mot de passe.");
+      return;
+    }
     setLoading(true);
-    const { error } = await signInWithEmail(email.trim(), password);
+    const { error } = await signInWithEmail(email.trim().toLowerCase(), password);
     setLoading(false);
-    if (error) Alert.alert("Erreur", error.message);
-    else router.replace("/(tabs)/feed");
+    if (error) {
+      const msg = ERROR_MAP[error.message] ?? error.message;
+      Alert.alert("Connexion impossible", msg);
+      return;
+    }
+    router.replace("/(tabs)/feed");
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-white">
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 bg-white"
+    >
       <View className="flex-1 px-6 justify-center">
         <Text className="text-3xl font-semibold text-gray-900 mb-1">Connexion</Text>
-        <Text className="text-sm text-gray-400 mb-8">Communauté éleveurs Guyane</Text>
+        <Text className="text-sm text-gray-400 mb-8">Communauté éleveurs Guyane 🐦</Text>
 
         <Text className="text-xs font-medium text-gray-600 mb-1.5">Email</Text>
         <TextInput
@@ -31,7 +50,8 @@ export default function LoginScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
           placeholder="ton@email.com"
-          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 mb-4"
+          returnKeyType="next"
+          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-4"
           placeholderTextColor="#9CA3AF"
         />
 
@@ -41,7 +61,9 @@ export default function LoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
           placeholder="••••••••"
-          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 mb-6"
+          returnKeyType="done"
+          onSubmitEditing={handleLogin}
+          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-6"
           placeholderTextColor="#9CA3AF"
         />
 
@@ -49,13 +71,20 @@ export default function LoginScreen() {
           onPress={handleLogin}
           disabled={loading}
           className={`rounded-xl py-3.5 items-center mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
+          activeOpacity={0.85}
         >
-          <Text className="text-white font-semibold">{loading ? "Connexion…" : "Se connecter"}</Text>
+          <Text className="text-white font-semibold text-base">
+            {loading ? "Connexion…" : "Se connecter"}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.replace("/auth/register")} className="items-center">
+        <TouchableOpacity
+          onPress={() => router.replace("/auth/register")}
+          className="items-center py-2"
+        >
           <Text className="text-sm text-gray-400">
-            Pas encore de compte ? <Text className="text-accent font-medium">Créer un compte</Text>
+            Pas encore de compte ?{" "}
+            <Text className="text-accent font-semibold">Créer un compte</Text>
           </Text>
         </TouchableOpacity>
       </View>
