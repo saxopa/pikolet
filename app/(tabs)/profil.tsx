@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
+import { useProfileStats } from "../../hooks/useProfileStats";
 import { Avatar } from "../../components/ui/Avatar";
 import { signOut } from "../../lib/supabase";
 import { useRouter } from "expo-router";
@@ -17,6 +18,7 @@ function Stat({ value, label }: StatProps) {
 
 export default function ProfilScreen() {
   const { profile, user, isAuthenticated } = useAuth();
+  const stats = useProfileStats(user?.id);
   const router = useRouter();
 
   if (!isAuthenticated) {
@@ -67,13 +69,13 @@ export default function ProfilScreen() {
 
       {/* Stats */}
       <View className="flex-row border-t border-b border-gray-100 mx-0">
-        <Stat value="—" label="oiseaux" />
+        <Stat value={stats?.bird_count ?? "—"} label="oiseaux" />
         <View className="w-px bg-gray-100" />
-        <Stat value="—" label="chants" />
+        <Stat value={stats?.song_count ?? "—"} label="chants" />
         <View className="w-px bg-gray-100" />
-        <Stat value="—" label="abonnés" />
+        <Stat value={stats?.follower_count ?? "—"} label="abonnés" />
         <View className="w-px bg-gray-100" />
-        <Stat value="—" label="victoires" />
+        <Stat value={stats?.win_count ?? "—"} label="victoires" />
       </View>
 
       {/* Actions */}

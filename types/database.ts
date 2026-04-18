@@ -1,129 +1,73 @@
-// Type généré pour le client Supabase typé
-// À remplacer par le résultat de `supabase gen types typescript` après migration
-
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: {
-          id: string;
-          username: string;
-          display_name: string | null;
-          location: string | null;
-          bio: string | null;
-          is_public: boolean;
-          avatar_url: string | null;
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["profiles"]["Row"], "created_at">;
-        Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Row: { id: string; username: string; display_name: string | null; location: string | null; bio: string | null; is_public: boolean; avatar_url: string | null; created_at: string };
+        Insert: { id: string; username: string; display_name?: string | null; location?: string | null; bio?: string | null; is_public?: boolean; avatar_url?: string | null; created_at?: string };
+        Update: { id?: string; username?: string; display_name?: string | null; location?: string | null; bio?: string | null; is_public?: boolean; avatar_url?: string | null; created_at?: string };
+        Relationships: [];
       };
       birds: {
-        Row: {
-          id: string;
-          owner_id: string;
-          name: string;
-          species: "pikolet" | "lorti";
-          gender: "male" | "femelle" | null;
-          ring_code: string | null;
-          birth_date: string | null;
-          lineage: string | null;
-          status: "en_forme" | "mue" | "reproduction" | "entrainement";
-          is_public: boolean;
-          father_id: string | null;
-          mother_id: string | null;
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["birds"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["birds"]["Insert"]>;
+        Row: { id: string; owner_id: string; name: string; species: string; gender: string | null; ring_code: string | null; birth_date: string | null; lineage: string | null; status: string; is_public: boolean; father_id: string | null; mother_id: string | null; created_at: string };
+        Insert: { id?: string; owner_id: string; name: string; species: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; father_id?: string | null; mother_id?: string | null; created_at?: string };
+        Update: { id?: string; owner_id?: string; name?: string; species?: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; father_id?: string | null; mother_id?: string | null; created_at?: string };
+        Relationships: [];
       };
       bird_songs: {
-        Row: {
-          id: string;
-          bird_id: string;
-          owner_id: string;
-          title: string;
-          song_type: string | null;
-          source_type: "upload" | "youtube";
-          storage_url: string | null;
-          youtube_url: string | null;
-          duration_seconds: number | null;
-          play_count: number;
-          is_public: boolean;
-          recorded_at: string | null;
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["bird_songs"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["bird_songs"]["Insert"]>;
+        Row: { id: string; bird_id: string; owner_id: string; title: string; song_type: string | null; source_type: string; storage_url: string | null; youtube_url: string | null; duration_seconds: number | null; play_count: number; is_public: boolean; recorded_at: string | null; created_at: string };
+        Insert: { id?: string; bird_id: string; owner_id: string; title: string; song_type?: string | null; source_type: string; storage_url?: string | null; youtube_url?: string | null; duration_seconds?: number | null; play_count?: number; is_public?: boolean; recorded_at?: string | null; created_at?: string };
+        Update: { id?: string; bird_id?: string; owner_id?: string; title?: string; song_type?: string | null; source_type?: string; storage_url?: string | null; youtube_url?: string | null; duration_seconds?: number | null; play_count?: number; is_public?: boolean; recorded_at?: string | null; created_at?: string };
+        Relationships: [];
       };
       bird_logs: {
-        Row: {
-          id: string;
-          bird_id: string;
-          log_type: "entrainement" | "concours" | "alimentation" | "sante" | "note";
-          note: string | null;
-          weight_g: number | null;
-          logged_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["bird_logs"]["Row"], "id">;
-        Update: Partial<Database["public"]["Tables"]["bird_logs"]["Insert"]>;
+        Row: { id: string; bird_id: string; log_type: string; note: string | null; weight_g: number | null; logged_at: string };
+        Insert: { id?: string; bird_id: string; log_type: string; note?: string | null; weight_g?: number | null; logged_at?: string };
+        Update: { id?: string; bird_id?: string; log_type?: string; note?: string | null; weight_g?: number | null; logged_at?: string };
+        Relationships: [];
       };
       bird_pairings: {
-        Row: {
-          id: string;
-          father_id: string;
-          mother_id: string;
-          pairing_date: string | null;
-          eggs_count: number;
-          hatchlings_count: number;
-          notes: string | null;
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["bird_pairings"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["bird_pairings"]["Insert"]>;
+        Row: { id: string; father_id: string; mother_id: string; pairing_date: string | null; eggs_count: number; hatchlings_count: number; notes: string | null; created_at: string };
+        Insert: { id?: string; father_id: string; mother_id: string; pairing_date?: string | null; eggs_count?: number; hatchlings_count?: number; notes?: string | null; created_at?: string };
+        Update: { id?: string; father_id?: string; mother_id?: string; pairing_date?: string | null; eggs_count?: number; hatchlings_count?: number; notes?: string | null; created_at?: string };
+        Relationships: [];
       };
       posts: {
-        Row: {
-          id: string;
-          author_id: string;
-          content: string | null;
-          visibility: "public" | "followers" | "private";
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["posts"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["posts"]["Insert"]>;
+        Row: { id: string; author_id: string; content: string | null; visibility: string; created_at: string };
+        Insert: { id?: string; author_id: string; content?: string | null; visibility?: string; created_at?: string };
+        Update: { id?: string; author_id?: string; content?: string | null; visibility?: string; created_at?: string };
+        Relationships: [];
       };
       post_songs: {
         Row: { post_id: string; song_id: string };
-        Insert: Database["public"]["Tables"]["post_songs"]["Row"];
-        Update: Partial<Database["public"]["Tables"]["post_songs"]["Row"]>;
+        Insert: { post_id: string; song_id: string };
+        Update: { post_id?: string; song_id?: string };
+        Relationships: [];
       };
       post_likes: {
         Row: { post_id: string; user_id: string };
-        Insert: Database["public"]["Tables"]["post_likes"]["Row"];
-        Update: Partial<Database["public"]["Tables"]["post_likes"]["Row"]>;
+        Insert: { post_id: string; user_id: string };
+        Update: { post_id?: string; user_id?: string };
+        Relationships: [];
       };
       post_comments: {
-        Row: {
-          id: string;
-          post_id: string;
-          author_id: string;
-          content: string;
-          created_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["post_comments"]["Row"], "id" | "created_at">;
-        Update: Partial<Database["public"]["Tables"]["post_comments"]["Insert"]>;
+        Row: { id: string; post_id: string; author_id: string; content: string; created_at: string };
+        Insert: { id?: string; post_id: string; author_id: string; content: string; created_at?: string };
+        Update: { id?: string; post_id?: string; author_id?: string; content?: string; created_at?: string };
+        Relationships: [];
       };
       follows: {
         Row: { follower_id: string; following_id: string; created_at: string };
-        Insert: Omit<Database["public"]["Tables"]["follows"]["Row"], "created_at">;
-        Update: Partial<Database["public"]["Tables"]["follows"]["Insert"]>;
+        Insert: { follower_id: string; following_id: string; created_at?: string };
+        Update: { follower_id?: string; following_id?: string; created_at?: string };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      increment_play_count: { Args: { song_id: string }; Returns: undefined };
+    };
     Enums: Record<string, never>;
   };
 }

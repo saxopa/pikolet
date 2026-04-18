@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../types/database";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRecord = Record<string, any>;
 import type { Post, Bird, BirdSong, Profile, BirdLog } from "../types";
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -27,7 +29,7 @@ export const getProfile = (userId: string) =>
   supabase.from("profiles").select("*").eq("id", userId).single();
 
 export const upsertProfile = (profile: Partial<Profile> & { id: string }) =>
-  supabase.from("profiles").upsert(profile);
+  supabase.from("profiles").upsert(profile as Database["public"]["Tables"]["profiles"]["Insert"]);
 
 // ─── Feed ───────────────────────────────────────────────────────────────────
 
@@ -126,7 +128,7 @@ export const getMySongs = (ownerId: string) =>
     .order("created_at", { ascending: false });
 
 export const incrementPlayCount = (songId: string) =>
-  supabase.rpc("increment_play_count" as never, { song_id: songId });
+  supabase.rpc("increment_play_count", { song_id: songId });
 
 export const addSong = (song: Omit<BirdSong, "id" | "created_at" | "play_count">) =>
   supabase.from("bird_songs").insert({ ...song, play_count: 0 }).select().single();
