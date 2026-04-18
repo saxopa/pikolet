@@ -27,7 +27,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Pikolèt",
+      "shortName": "Pikolèt",
+      "description": "Communauté éleveurs Guyane — pikolèt & lorti",
+      "themeColor": "#1D9E75",
+      "backgroundColor": "#ffffff",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       "expo-router"
