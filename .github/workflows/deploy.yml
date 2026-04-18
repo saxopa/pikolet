@@ -30,6 +30,9 @@ jobs:
       - name: Build PWA statique
         run: npx expo export --platform web
 
+      - name: Copie index.html → 404.html (SPA deep-link support)
+        run: cp dist/index.html dist/404.html
+
       - name: Déployer sur GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
