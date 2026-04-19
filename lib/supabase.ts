@@ -35,8 +35,10 @@ export const getSession = () => supabase.auth.getSession();
 export const getProfile = (userId: string) =>
   supabase.from("profiles").select("*").eq("id", userId).single();
 
-export const upsertProfile = (profile: Partial<Profile> & { id: string }) =>
-  supabase.from("profiles").upsert(profile as Database["public"]["Tables"]["profiles"]["Insert"]);
+export const upsertProfile = (profile: Partial<Profile> & { id: string }) => {
+  const { id, ...data } = profile;
+  return supabase.from("profiles").update(data as Database["public"]["Tables"]["profiles"]["Update"]).eq("id", id);
+};
 
 // ─── Feed ───────────────────────────────────────────────────────────────────
 
