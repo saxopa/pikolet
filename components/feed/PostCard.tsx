@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Platform, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "../ui/Avatar";
@@ -77,6 +77,20 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
       <View className="px-3.5 pb-3">
         {post.content && (
           <Text className="text-[13px] text-gray-600 leading-5 mb-2.5">{post.content}</Text>
+        )}
+        {post.image_url && (
+          <Image
+            source={{ uri: post.image_url }}
+            style={{ width: "100%", height: 200, borderRadius: 12 }}
+            resizeMode="cover"
+            className="mb-2"
+          />
+        )}
+        {post.audio_url && (
+          <AudioPlayer url={post.audio_url} duration={null} title="Audio" />
+        )}
+        {post.youtube_url && post.post_songs.length === 0 && (
+          <AudioPlayer url={null} youtubeUrl={post.youtube_url} duration={null} title="Lien YouTube" />
         )}
         {post.post_songs.map(({ song }) => (
           <AudioPlayer
