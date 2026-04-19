@@ -27,18 +27,22 @@ export function useBirdDetail(birdId: string) {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (silent = false) => {
+    if (!birdId) return;
     if (!silent) setLoading(true);
-    const [birdRes, logsRes, songsRes, compsRes] = await Promise.all([
-      getBird(birdId),
-      getBirdLogs(birdId),
-      getBirdSongs(birdId),
-      getBirdCompetitions(birdId),
-    ]);
-    if (birdRes.data) setBird(birdRes.data as unknown as Bird);
-    if (logsRes.data) setLogs(logsRes.data as BirdLog[]);
-    if (songsRes.data) setSongs(songsRes.data as unknown as BirdSong[]);
-    if (compsRes.data) setCompetitions(compsRes.data as Competition[]);
-    setLoading(false);
+    try {
+      const [birdRes, logsRes, songsRes, compsRes] = await Promise.all([
+        getBird(birdId),
+        getBirdLogs(birdId),
+        getBirdSongs(birdId),
+        getBirdCompetitions(birdId),
+      ]);
+      if (birdRes.data) setBird(birdRes.data as unknown as Bird);
+      if (logsRes.data) setLogs(logsRes.data as BirdLog[]);
+      if (songsRes.data) setSongs(songsRes.data as unknown as BirdSong[]);
+      if (compsRes.data) setCompetitions(compsRes.data as Competition[]);
+    } finally {
+      setLoading(false);
+    }
   }, [birdId]);
 
   useEffect(() => { load(); }, [load]);

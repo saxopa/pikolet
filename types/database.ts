@@ -10,9 +10,9 @@ export interface Database {
         Relationships: [];
       };
       birds: {
-        Row: { id: string; owner_id: string; name: string; species: string; gender: string | null; ring_code: string | null; birth_date: string | null; lineage: string | null; status: string; is_public: boolean; father_id: string | null; mother_id: string | null; created_at: string };
-        Insert: { id?: string; owner_id: string; name: string; species: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; father_id?: string | null; mother_id?: string | null; created_at?: string };
-        Update: { id?: string; owner_id?: string; name?: string; species?: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; father_id?: string | null; mother_id?: string | null; created_at?: string };
+        Row: { id: string; owner_id: string; name: string; species: string; gender: string | null; ring_code: string | null; birth_date: string | null; lineage: string | null; status: string; is_public: boolean; image_url: string | null; father_id: string | null; mother_id: string | null; created_at: string };
+        Insert: { id?: string; owner_id: string; name: string; species: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; image_url?: string | null; father_id?: string | null; mother_id?: string | null; created_at?: string };
+        Update: { id?: string; owner_id?: string; name?: string; species?: string; gender?: string | null; ring_code?: string | null; birth_date?: string | null; lineage?: string | null; status?: string; is_public?: boolean; image_url?: string | null; father_id?: string | null; mother_id?: string | null; created_at?: string };
         Relationships: [];
       };
       bird_songs: {
@@ -34,9 +34,9 @@ export interface Database {
         Relationships: [];
       };
       posts: {
-        Row: { id: string; author_id: string; content: string | null; visibility: string; created_at: string };
-        Insert: { id?: string; author_id: string; content?: string | null; visibility?: string; created_at?: string };
-        Update: { id?: string; author_id?: string; content?: string | null; visibility?: string; created_at?: string };
+        Row: { id: string; author_id: string; content: string | null; visibility: string; image_url: string | null; audio_url: string | null; youtube_url: string | null; created_at: string };
+        Insert: { id?: string; author_id: string; content?: string | null; visibility?: string; image_url?: string | null; audio_url?: string | null; youtube_url?: string | null; created_at?: string };
+        Update: { id?: string; author_id?: string; content?: string | null; visibility?: string; image_url?: string | null; audio_url?: string | null; youtube_url?: string | null; created_at?: string };
         Relationships: [];
       };
       post_songs: {
@@ -58,9 +58,15 @@ export interface Database {
         Relationships: [];
       };
       follows: {
-        Row: { follower_id: string; following_id: string; created_at: string };
-        Insert: { follower_id: string; following_id: string; created_at?: string };
-        Update: { follower_id?: string; following_id?: string; created_at?: string };
+        Row: { follower_id: string; following_id: string; status: string; created_at: string };
+        Insert: { follower_id: string; following_id: string; status?: string; created_at?: string };
+        Update: { follower_id?: string; following_id?: string; status?: string; created_at?: string };
+        Relationships: [];
+      };
+      competitions: {
+        Row: { id: string; bird_id: string; owner_id: string; name: string; location: string | null; date: string; rank: number; notes: string | null; created_at: string };
+        Insert: { id?: string; bird_id: string; owner_id: string; name: string; location?: string | null; date: string; rank?: number; notes?: string | null; created_at?: string };
+        Update: { id?: string; bird_id?: string; owner_id?: string; name?: string; location?: string | null; date?: string; rank?: number; notes?: string | null; created_at?: string };
         Relationships: [];
       };
     };

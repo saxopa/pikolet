@@ -97,8 +97,11 @@ export default function BirdDetailScreen() {
     refresh();
   }
 
-  if (loading || !bird) {
+  if (loading) {
     return <View className="flex-1 bg-white items-center justify-center"><Text className="text-gray-400">Chargement…</Text></View>;
+  }
+  if (!bird) {
+    return <View className="flex-1 bg-white items-center justify-center"><Text className="text-gray-400">Oiseau introuvable</Text></View>;
   }
 
   return (
