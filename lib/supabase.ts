@@ -141,6 +141,40 @@ export const incrementPlayCount = (songId: string) =>
 export const addSong = (song: Omit<BirdSong, "id" | "created_at" | "play_count">) =>
   supabase.from("bird_songs").insert({ ...song, play_count: 0 }).select().single();
 
+// ─── Profil public ──────────────────────────────────────────────────────────
+
+export const getProfileByUsername = (username: string) =>
+  supabase.from("profiles").select("*").eq("username", username).single();
+
+export const getProfilePosts = (userId: string) =>
+  supabase
+    .from("posts")
+    .select(`
+      *,
+      author:profiles!posts_author_id_fkey(id, username, display_name, avatar_url, location),
+      post_songs(song:bird_songs(*, bird:birds(id, name, species))),
+      post_likes(user_id),
+      post_comments(count)
+    `)
+    .eq("author_id", userId)
+    .eq("visibility", "public")
+    .order("created_at", { ascending: false });
+
+export const getPublicBirds = (userId: string) =>
+  supabase
+    .from("birds")
+    .select("*")
+    .eq("owner_id", userId)
+    .eq("is_public", true)
+    .order("created_at", { ascending: false });
+
+export const isFollowing = (followerId: string, followingId: string) =>
+  supabase
+    .from("follows")
+    .select("follower_id")
+    .match({ follower_id: followerId, following_id: followingId })
+    .maybeSingle();
+
 // ─── Storage audio ──────────────────────────────────────────────────────────
 
 export const uploadBirdSong = async (ownerId: string, fileUri: string, fileName: string, mimeType: string) => {
