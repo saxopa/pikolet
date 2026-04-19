@@ -7,8 +7,8 @@ import {
   signOut, getProfilePosts, getMyBirds, getMySongs,
   deletePost, getPendingRequests, acceptFollowRequest, rejectFollowRequest,
 } from "../../lib/supabase";
-import { useRouter } from "expo-router";
-import { useState, useCallback, useEffect } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { PostCard } from "../../components/feed/PostCard";
 import { BirdCard } from "../../components/bird/BirdCard";
@@ -56,6 +56,7 @@ export default function ProfilScreen() {
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
 
   const likePost = usePostLike(user?.id, setPosts);
+  const isMounted = useRef(false);
 
   const loadTab = useCallback(async (tab: Tab, userId: string) => {
     setTabLoading(true);
@@ -76,12 +77,19 @@ export default function ProfilScreen() {
     if (user?.id) loadTab(activeTab, user.id);
   }, [activeTab, user?.id, loadTab]);
 
-  useEffect(() => {
+  const loadPendingRequests = useCallback(() => {
     if (!user?.id) return;
     getPendingRequests(user.id).then(({ data }) => {
       if (data) setPendingRequests(data as unknown as PendingRequest[]);
     });
   }, [user?.id]);
+
+  useEffect(() => { loadPendingRequests(); }, [loadPendingRequests]);
+
+  useFocusEffect(useCallback(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    loadPendingRequests();
+  }, [loadPendingRequests]));
 
   async function handleAccept(followerId: string) {
     await acceptFollowRequest(followerId, user!.id);
