@@ -140,6 +140,20 @@ export const incrementPlayCount = (songId: string) =>
 export const addSong = (song: Omit<BirdSong, "id" | "created_at" | "play_count">) =>
   supabase.from("bird_songs").insert({ ...song, play_count: 0 }).select().single();
 
+// ─── Storage audio ──────────────────────────────────────────────────────────
+
+export const uploadBirdSong = async (ownerId: string, fileUri: string, fileName: string, mimeType: string) => {
+  const path = `${ownerId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+  const { error } = await supabase.storage
+    .from("bird-songs")
+    .upload(path, blob, { contentType: mimeType || "audio/mpeg", upsert: false });
+  if (error) return { url: null, error };
+  const { data: urlData } = supabase.storage.from("bird-songs").getPublicUrl(path);
+  return { url: urlData.publicUrl, error: null };
+};
+
 // ─── Follows ────────────────────────────────────────────────────────────────
 
 export const toggleFollow = async (followerId: string, followingId: string, following: boolean) => {

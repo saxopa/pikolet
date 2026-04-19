@@ -1,6 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, TextInput, ActivityIndicator } from "react-native";
-import { useState, useMemo } from "react";
-import { useRouter } from "expo-router";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useFeed } from "../../hooks/useFeed";
 import { useAuth } from "../../hooks/useAuth";
@@ -16,6 +16,8 @@ export default function FeedScreen() {
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
+
+  useFocusEffect(useCallback(() => { refresh(); }, []));
 
   const filtered = useMemo(() => {
     if (!query.trim()) return posts;

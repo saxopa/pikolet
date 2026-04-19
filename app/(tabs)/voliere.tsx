@@ -1,6 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, TextInput } from "react-native";
-import { useState, useMemo } from "react";
-import { useRouter } from "expo-router";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../hooks/useAuth";
 import { useVoliere } from "../../hooks/useVoliere";
@@ -13,6 +13,8 @@ export default function VoliereScreen() {
   const { birds, loading, refresh } = useVoliere(user?.id);
   const router = useRouter();
   const [query, setQuery] = useState("");
+
+  useFocusEffect(useCallback(() => { refresh(); }, []));
 
   const filtered = useMemo(() => {
     if (!query.trim()) return birds;

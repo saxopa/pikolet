@@ -30,7 +30,7 @@ export interface Bird {
 }
 
 export type SongType = "chant_libre" | "cage_collee" | "femelle" | "stimulation";
-export type SourceType = "upload" | "youtube";
+export type SourceType = "upload" | "youtube" | "storage";
 
 export interface BirdSong {
   id: string;

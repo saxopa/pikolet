@@ -20,9 +20,13 @@ export function useFeed(userId?: string) {
   const [hasMore, setHasMore] = useState(true);
   const offsetRef = useRef(0);
 
-  const loadPage = useCallback(async (reset: boolean) => {
-    if (reset) { offsetRef.current = 0; setLoading(true); }
-    else setLoadingMore(true);
+  const loadPage = useCallback(async (reset: boolean, silent = false) => {
+    if (reset) {
+      offsetRef.current = 0;
+      if (!silent) setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     const { data, error } = await getFeedPosts(PAGE_SIZE, offsetRef.current);
     if (!error && data) {
       const next = data as unknown as FeedPost[];
@@ -54,7 +58,7 @@ export function useFeed(userId?: string) {
 
   return {
     posts, loading, refreshing, loadingMore, hasMore,
-    refresh: () => { setRefreshing(true); loadPage(true); },
+    refresh: () => { setRefreshing(true); loadPage(true, true); },
     loadMore: () => { if (!loadingMore && hasMore) loadPage(false); },
     like,
   };

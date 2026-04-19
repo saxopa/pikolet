@@ -25,21 +25,20 @@ export function useBirdDetail(birdId: string) {
   const [songs, setSongs] = useState<BirdSong[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const [birdRes, logsRes, songsRes] = await Promise.all([
-        getBird(birdId),
-        getBirdLogs(birdId),
-        getBirdSongs(birdId),
-      ]);
-      if (birdRes.data) setBird(birdRes.data as unknown as Bird);
-      if (logsRes.data) setLogs(logsRes.data as BirdLog[]);
-      if (songsRes.data) setSongs(songsRes.data as unknown as BirdSong[]);
-      setLoading(false);
-    }
-    load();
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    const [birdRes, logsRes, songsRes] = await Promise.all([
+      getBird(birdId),
+      getBirdLogs(birdId),
+      getBirdSongs(birdId),
+    ]);
+    if (birdRes.data) setBird(birdRes.data as unknown as Bird);
+    if (logsRes.data) setLogs(logsRes.data as BirdLog[]);
+    if (songsRes.data) setSongs(songsRes.data as unknown as BirdSong[]);
+    setLoading(false);
   }, [birdId]);
 
-  return { bird, logs, songs, loading };
+  useEffect(() => { load(); }, [load]);
+
+  return { bird, logs, songs, loading, refresh: () => load(true) };
 }
