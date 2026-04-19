@@ -78,6 +78,21 @@ export interface Post {
   author_id: string;
   content: string | null;
   visibility: Visibility;
+  image_url: string | null;
+  audio_url: string | null;
+  youtube_url: string | null;
+  created_at: string;
+}
+
+export interface Competition {
+  id: string;
+  bird_id: string;
+  owner_id: string;
+  name: string;
+  location: string | null;
+  date: string;
+  rank: number;
+  notes: string | null;
   created_at: string;
 }
 

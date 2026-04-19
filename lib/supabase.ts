@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../types/database";
-import type { Post, Bird, BirdSong, Profile, BirdLog } from "../types";
+import type { Post, Bird, BirdSong, Profile, BirdLog, Competition } from "../types";
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
@@ -73,8 +73,12 @@ export const getPostComments = (postId: string) =>
 export const addComment = (postId: string, authorId: string, content: string) =>
   supabase.from("post_comments").insert({ post_id: postId, author_id: authorId, content });
 
-export const createPost = (authorId: string, content: string) =>
-  supabase.from("posts").insert({ author_id: authorId, content }).select().single();
+export const createPost = (
+  authorId: string,
+  content: string,
+  media?: { image_url?: string; audio_url?: string; youtube_url?: string }
+) =>
+  supabase.from("posts").insert({ author_id: authorId, content, ...media }).select().single();
 
 export const linkSongToPost = (postId: string, songId: string) =>
   supabase.from("post_songs").insert({ post_id: postId, song_id: songId });
@@ -235,6 +239,43 @@ export const deleteBird = (birdId: string) =>
 
 export const deleteSong = (songId: string) =>
   supabase.from("bird_songs").delete().eq("id", songId);
+
+// ─── Concours ───────────────────────────────────────────────────────────────
+
+export const createCompetition = (comp: Omit<Competition, "id" | "created_at">) =>
+  supabase.from("competitions").insert(comp).select().single();
+
+export const getBirdCompetitions = (birdId: string) =>
+  supabase.from("competitions").select("*").eq("bird_id", birdId).order("date", { ascending: false });
+
+export const deleteCompetition = (compId: string) =>
+  supabase.from("competitions").delete().eq("id", compId);
+
+// ─── Storage post media ──────────────────────────────────────────────────────
+
+export const uploadPostImage = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
+  const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+  const { error } = await supabase.storage
+    .from("post-images")
+    .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: false });
+  if (error) return { url: null, error };
+  const { data: urlData } = supabase.storage.from("post-images").getPublicUrl(path);
+  return { url: urlData.publicUrl, error: null };
+};
+
+export const uploadPostAudio = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
+  const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+  const { error } = await supabase.storage
+    .from("post-audio")
+    .upload(path, blob, { contentType: mimeType || "audio/mpeg", upsert: false });
+  if (error) return { url: null, error };
+  const { data: urlData } = supabase.storage.from("post-audio").getPublicUrl(path);
+  return { url: urlData.publicUrl, error: null };
+};
 
 // ─── Storage avatars ────────────────────────────────────────────────────────
 
