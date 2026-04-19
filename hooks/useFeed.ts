@@ -40,7 +40,14 @@ export function useFeed(userId?: string) {
     setRefreshing(false);
   }, []);
 
+  // Chargement initial uniquement
   useEffect(() => { loadPage(true); }, [loadPage]);
+
+  // Refresh memoized exposé pour useFocusEffect
+  const refresh = useCallback(() => {
+    setRefreshing(true);
+    loadPage(true, true);
+  }, [loadPage]);
 
   const like = useCallback(async (postId: string) => {
     if (!userId) return;
@@ -58,7 +65,7 @@ export function useFeed(userId?: string) {
 
   return {
     posts, loading, refreshing, loadingMore, hasMore,
-    refresh: () => { setRefreshing(true); loadPage(true, true); },
+    refresh,
     loadMore: () => { if (!loadingMore && hasMore) loadPage(false); },
     like,
   };

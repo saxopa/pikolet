@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useBirdDetail } from "../../hooks/useVoliere";
 import { Badge } from "../../components/ui/Badge";
 import { AudioPlayer } from "../../components/audio/AudioPlayer";
@@ -23,8 +23,12 @@ export default function BirdDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { bird, logs, songs, loading, refresh } = useBirdDetail(id);
   const router = useRouter();
+  const isMounted = useRef(false);
 
-  useFocusEffect(useCallback(() => { refresh(); }, []));
+  useFocusEffect(useCallback(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    refresh();
+  }, [refresh]));
 
   if (loading || !bird) {
     return <View className="flex-1 bg-white items-center justify-center"><Text className="text-gray-400">Chargement…</Text></View>;
@@ -53,7 +57,6 @@ export default function BirdDetailScreen() {
         {bird.birth_date && <InfoRow label="Né le" value={new Date(bird.birth_date).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })} />}
         {bird.lineage && <InfoRow label="Lignée" value={bird.lineage} />}
 
-        {/* Chants */}
         <View className="mt-5">
           <View className="flex-row items-center justify-between mb-3">
             <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Ses chants</Text>
@@ -73,7 +76,6 @@ export default function BirdDetailScreen() {
           )}
         </View>
 
-        {/* Journal */}
         <View className="mt-5">
           <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Journal de suivi</Text>
           {logs.length === 0 ? (
