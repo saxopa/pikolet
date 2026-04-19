@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useFeed } from "../../hooks/useFeed";
+import { deletePost } from "../../lib/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import { PostCard } from "../../components/feed/PostCard";
 import { CommentsSheet } from "../../components/feed/CommentsSheet";
@@ -103,6 +104,7 @@ export default function FeedScreen() {
               userId={user?.id}
               onLike={() => like(item.id)}
               onComment={() => setCommentPostId(item.id)}
+              onDelete={async (id) => { await deletePost(id); refresh(); }}
             />
           )}
         />

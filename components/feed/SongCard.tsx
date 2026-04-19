@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer } from "../audio/AudioPlayer";
 import type { SongWithMeta } from "../../hooks/useChants";
 
@@ -9,9 +10,19 @@ const SONG_TYPE_LABEL: Record<string, string> = {
   stimulation: "Stimulation",
 };
 
-type Props = { song: SongWithMeta };
+type Props = {
+  song: SongWithMeta;
+  onDelete?: (songId: string) => void;
+};
 
-export function SongCard({ song }: Props) {
+export function SongCard({ song, onDelete }: Props) {
+  function confirmDelete() {
+    Alert.alert("Supprimer ce chant ?", "Cette action est irréversible.", [
+      { text: "Annuler", style: "cancel" },
+      { text: "Supprimer", style: "destructive", onPress: () => onDelete?.(song.id) },
+    ]);
+  }
+
   return (
     <View className="bg-white border border-gray-100 rounded-2xl mb-2.5 overflow-hidden">
       <View className="px-3.5 pt-3 pb-1 flex-row items-start gap-3">
@@ -23,13 +34,22 @@ export function SongCard({ song }: Props) {
           <Text className="text-[11px] text-gray-500 mt-0.5">
             {song.bird?.species === "pikolet" ? "Pikolèt" : "Lorti"} · {song.bird?.name}
           </Text>
-          <Text className="text-[11px] text-accent mt-0.5">Partagé par {song.owner?.username}</Text>
+          {song.owner?.username && (
+            <Text className="text-[11px] text-accent mt-0.5">Partagé par {song.owner.username}</Text>
+          )}
         </View>
-        {song.source_type === "youtube" && (
-          <View className="bg-red-500 px-1.5 py-0.5 rounded">
-            <Text className="text-white text-[9px] font-bold">YT</Text>
-          </View>
-        )}
+        <View className="flex-row items-center gap-2">
+          {song.source_type === "youtube" && (
+            <View className="bg-red-500 px-1.5 py-0.5 rounded">
+              <Text className="text-white text-[9px] font-bold">YT</Text>
+            </View>
+          )}
+          {onDelete && (
+            <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
+              <Ionicons name="trash-outline" size={16} color="#D1D5DB" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View className="px-3.5 pb-2">

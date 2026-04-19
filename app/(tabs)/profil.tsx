@@ -3,7 +3,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { useProfileStats } from "../../hooks/useProfileStats";
 import { Avatar } from "../../components/ui/Avatar";
 import { useToast } from "../../context/ToastContext";
-import { signOut, getProfilePosts, getMyBirds, getMySongs } from "../../lib/supabase";
+import {
+  signOut, getProfilePosts, getMyBirds, getMySongs,
+  deletePost, getPendingRequests, acceptFollowRequest, rejectFollowRequest,
+} from "../../lib/supabase";
 import { useRouter } from "expo-router";
 import { useState, useCallback, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,6 +15,7 @@ import { BirdCard } from "../../components/bird/BirdCard";
 import { SongCard } from "../../components/feed/SongCard";
 import { CommentsSheet } from "../../components/feed/CommentsSheet";
 import { Skeleton } from "../../components/ui/Skeleton";
+import { usePostLike } from "../../hooks/usePostLike";
 import type { Bird, BirdSong } from "../../types";
 import type { FeedPost } from "../../hooks/useFeed";
 
@@ -22,6 +26,11 @@ const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: "birds", label: "Oiseaux", icon: "leaf-outline" },
   { key: "songs", label: "Chants", icon: "musical-notes-outline" },
 ];
+
+type PendingRequest = {
+  follower_id: string;
+  follower: { id: string; username: string; display_name: string | null; avatar_url: string | null };
+};
 
 function EmptyTab({ icon, text }: { icon: string; text: string }) {
   return (
@@ -44,6 +53,9 @@ export default function ProfilScreen() {
   const [songs, setSongs] = useState<BirdSong[]>([]);
   const [tabLoading, setTabLoading] = useState(false);
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
+
+  const likePost = usePostLike(user?.id, setPosts);
 
   const loadTab = useCallback(async (tab: Tab, userId: string) => {
     setTabLoading(true);
@@ -63,6 +75,30 @@ export default function ProfilScreen() {
   useEffect(() => {
     if (user?.id) loadTab(activeTab, user.id);
   }, [activeTab, user?.id, loadTab]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getPendingRequests(user.id).then(({ data }) => {
+      if (data) setPendingRequests(data as unknown as PendingRequest[]);
+    });
+  }, [user?.id]);
+
+  async function handleAccept(followerId: string) {
+    await acceptFollowRequest(followerId, user!.id);
+    setPendingRequests(prev => prev.filter(r => r.follower_id !== followerId));
+    toast("Demande acceptée ✓");
+  }
+
+  async function handleReject(followerId: string) {
+    await rejectFollowRequest(followerId, user!.id);
+    setPendingRequests(prev => prev.filter(r => r.follower_id !== followerId));
+  }
+
+  async function handleDeletePost(postId: string) {
+    await deletePost(postId);
+    setPosts(prev => prev.filter(p => p.id !== postId));
+    toast("Post supprimé");
+  }
 
   if (!isAuthenticated) {
     return (
@@ -88,11 +124,6 @@ export default function ProfilScreen() {
     );
   }
 
-  async function handleSignOut() {
-    await signOut();
-    toast("Déconnexion réussie", "info");
-  }
-
   const renderTabContent = () => {
     if (tabLoading) {
       return (
@@ -111,8 +142,9 @@ export default function ProfilScreen() {
               key={p.id}
               post={p}
               userId={user?.id}
-              onLike={() => {}}
+              onLike={() => likePost(p.id)}
               onComment={() => setCommentPostId(p.id)}
+              onDelete={handleDeletePost}
             />
           ))}
         </View>
@@ -189,8 +221,37 @@ export default function ProfilScreen() {
           ))}
         </View>
 
+        {/* Demandes en attente */}
+        {pendingRequests.length > 0 && (
+          <View className="mx-4 mt-4 bg-amber-50 border border-amber-100 rounded-2xl p-3">
+            <Text className="text-xs font-semibold text-amber-700 mb-2">
+              🔔 {pendingRequests.length} demande{pendingRequests.length > 1 ? "s" : ""} d'abonnement
+            </Text>
+            {pendingRequests.map(req => (
+              <View key={req.follower_id} className="flex-row items-center gap-2 py-1.5">
+                <Avatar uri={req.follower.avatar_url} name={req.follower.display_name ?? req.follower.username} size={32} />
+                <Text className="flex-1 text-sm text-gray-800 font-medium">
+                  {req.follower.display_name ?? req.follower.username}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => handleAccept(req.follower_id)}
+                  className="px-3 py-1 bg-accent rounded-full"
+                >
+                  <Text className="text-white text-xs font-semibold">Accepter</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleReject(req.follower_id)}
+                  className="px-3 py-1 bg-gray-100 rounded-full"
+                >
+                  <Text className="text-gray-500 text-xs">Refuser</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* Onglets */}
-        <View className="flex-row border-b border-gray-100">
+        <View className="flex-row border-b border-gray-100 mt-4">
           {TABS.map(tab => (
             <TouchableOpacity
               key={tab.key}
@@ -211,8 +272,10 @@ export default function ProfilScreen() {
 
         {renderTabContent()}
 
-        {/* Déconnexion */}
-        <TouchableOpacity onPress={handleSignOut} className="py-4 items-center mt-2">
+        <TouchableOpacity
+          onPress={async () => { await signOut(); toast("Déconnexion réussie", "info"); }}
+          className="py-4 items-center mt-2"
+        >
           <Text className="text-gray-400 text-sm">Déconnexion</Text>
         </TouchableOpacity>
       </ScrollView>

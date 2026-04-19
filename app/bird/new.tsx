@@ -1,9 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  View, Text, TextInput, TouchableOpacity, ScrollView,
+  KeyboardAvoidingView, Platform, Image,
+} from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
-import { createBird } from "../../lib/supabase";
+import { createBird, updateBird, uploadBirdImage } from "../../lib/supabase";
 import type { BirdSpecies, BirdGender, BirdStatus } from "../../types";
 
 function Picker<T extends string>({ label, options, value, onChange }: { label: string; options: { key: T; label: string }[]; value: T; onChange: (v: T) => void }) {
@@ -25,6 +30,8 @@ function Picker<T extends string>({ label, options, value, onChange }: { label: 
   );
 }
 
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+
 export default function NewBirdScreen() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -35,30 +42,72 @@ export default function NewBirdScreen() {
   const [status, setStatus] = useState<BirdStatus>("en_forme");
   const [ringCode, setRingCode] = useState("");
   const [lineage, setLineage] = useState("");
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  async function pickImage() {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+      copyToCacheDirectory: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+    }
+  }
 
   async function handleCreate() {
     if (!name.trim()) { toast("Nom requis", "error"); return; }
     if (!user) { toast("Non connecté", "error"); return; }
     setLoading(true);
-    const { error } = await createBird({
+
+    const { data, error } = await createBird({
       owner_id: user.id, name: name.trim(), species, gender,
       status, ring_code: ringCode.trim() || null,
       lineage: lineage.trim() || null,
       is_public: true, birth_date: null, father_id: null, mother_id: null,
+      image_url: null,
     });
-    setLoading(false);
-    if (error) {
-      toast(error.message, "error");
-    } else {
-      toast("Oiseau ajouté ✓");
-      router.back();
+
+    if (error || !data) {
+      toast(error?.message ?? "Erreur", "error");
+      setLoading(false);
+      return;
     }
+
+    if (imageUri) {
+      const fileName = imageUri.split("/").pop() ?? "bird.jpg";
+      const mimeType = fileName.endsWith(".png") ? "image/png" : "image/jpeg";
+      const { url, error: imgError } = await uploadBirdImage(user.id, imageUri, fileName, mimeType);
+      if (!imgError && url) {
+        await updateBird(data.id, { image_url: url });
+      }
+    }
+
+    setLoading(false);
+    toast("Oiseau ajouté ✓");
+    router.back();
   }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-white">
       <ScrollView contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
+        {/* Photo oiseau */}
+        <View className="items-center mb-5">
+          <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={{ width: 96, height: 96, borderRadius: 20 }} />
+            ) : (
+              <View style={{ width: 96, height: 96, borderRadius: 20 }} className="bg-gray-100 items-center justify-center border border-dashed border-gray-300">
+                <Text className="text-4xl">{SPECIES_EMOJI[species] ?? "🐦"}</Text>
+              </View>
+            )}
+            <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-accent items-center justify-center border-2 border-white">
+              <Ionicons name="camera" size={13} color="white" />
+            </View>
+          </TouchableOpacity>
+          <Text className="text-xs text-gray-400 mt-2">Ajouter une photo (optionnel)</Text>
+        </View>
+
         <View className="mb-4">
           <Text className="text-xs font-medium text-gray-600 mb-1.5">Nom *</Text>
           <TextInput value={name} onChangeText={setName} placeholder="Ex: Prodige" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />

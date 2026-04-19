@@ -193,15 +193,73 @@ export const uploadBirdSong = async (ownerId: string, fileUri: string, fileName:
 
 // ─── Follows ────────────────────────────────────────────────────────────────
 
-export const toggleFollow = async (followerId: string, followingId: string, following: boolean) => {
-  if (following) {
-    return supabase.from("follows").delete().match({ follower_id: followerId, following_id: followingId });
-  }
-  return supabase.from("follows").insert({ follower_id: followerId, following_id: followingId });
-};
+export const getFollowStatus = (followerId: string, followingId: string) =>
+  supabase
+    .from("follows")
+    .select("status")
+    .match({ follower_id: followerId, following_id: followingId })
+    .maybeSingle();
+
+export const sendFollowRequest = (followerId: string, followingId: string) =>
+  supabase.from("follows").insert({ follower_id: followerId, following_id: followingId, status: "pending" });
+
+export const unfollowUser = (followerId: string, followingId: string) =>
+  supabase.from("follows").delete().match({ follower_id: followerId, following_id: followingId });
+
+export const acceptFollowRequest = (followerId: string, followingId: string) =>
+  supabase.from("follows").update({ status: "accepted" }).match({ follower_id: followerId, following_id: followingId });
+
+export const rejectFollowRequest = (followerId: string, followingId: string) =>
+  supabase.from("follows").delete().match({ follower_id: followerId, following_id: followingId });
+
+export const getPendingRequests = (userId: string) =>
+  supabase
+    .from("follows")
+    .select("follower_id, follower:profiles!follower_id(id, username, display_name, avatar_url)")
+    .eq("following_id", userId)
+    .eq("status", "pending");
 
 export const getFollowers = (userId: string) =>
-  supabase.from("follows").select("follower:profiles!follower_id(*)").eq("following_id", userId);
+  supabase.from("follows").select("follower:profiles!follower_id(*)").eq("following_id", userId).eq("status", "accepted");
 
 export const getFollowing = (userId: string) =>
-  supabase.from("follows").select("following:profiles!following_id(*)").eq("follower_id", userId);
+  supabase.from("follows").select("following:profiles!following_id(*)").eq("follower_id", userId).eq("status", "accepted");
+
+// ─── Suppression ────────────────────────────────────────────────────────────
+
+export const deletePost = (postId: string) =>
+  supabase.from("posts").delete().eq("id", postId);
+
+export const deleteBird = (birdId: string) =>
+  supabase.from("birds").delete().eq("id", birdId);
+
+export const deleteSong = (songId: string) =>
+  supabase.from("bird_songs").delete().eq("id", songId);
+
+// ─── Storage avatars ────────────────────────────────────────────────────────
+
+export const uploadAvatar = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
+  const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+  const { error } = await supabase.storage
+    .from("avatars")
+    .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: true });
+  if (error) return { url: null, error };
+  const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+  return { url: urlData.publicUrl, error: null };
+};
+
+// ─── Storage images oiseaux ─────────────────────────────────────────────────
+
+export const uploadBirdImage = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
+  const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+  const { error } = await supabase.storage
+    .from("bird-images")
+    .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: false });
+  if (error) return { url: null, error };
+  const { data: urlData } = supabase.storage.from("bird-images").getPublicUrl(path);
+  return { url: urlData.publicUrl, error: null };
+};

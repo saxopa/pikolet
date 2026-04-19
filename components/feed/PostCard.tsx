@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "../ui/Avatar";
@@ -10,6 +10,7 @@ type Props = {
   userId?: string;
   onLike: () => void;
   onComment: () => void;
+  onDelete?: (postId: string) => void;
 };
 
 function timeAgo(date: string) {
@@ -24,12 +25,20 @@ function timeAgo(date: string) {
 const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
 const SPECIES_LABEL: Record<string, string> = { pikolet: "Pikolèt", lorti: "Lorti" };
 
-export function PostCard({ post, userId, onLike, onComment }: Props) {
+export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
   const liked = post.post_likes.some(l => l.user_id === userId);
   const likeCount = post.post_likes.length;
   const commentCount = post.post_comments?.[0]?.count ?? 0;
   const species = post.post_songs[0]?.song?.bird?.species;
+  const isOwn = userId === post.author.id;
   const router = useRouter();
+
+  function confirmDelete() {
+    Alert.alert("Supprimer ce post ?", "Cette action est irréversible.", [
+      { text: "Annuler", style: "cancel" },
+      { text: "Supprimer", style: "destructive", onPress: () => onDelete?.(post.id) },
+    ]);
+  }
 
   return (
     <View className="bg-white border border-gray-100 rounded-2xl mb-3 overflow-hidden">
@@ -51,6 +60,11 @@ export function PostCard({ post, userId, onLike, onComment }: Props) {
               {SPECIES_EMOJI[species]} {SPECIES_LABEL[species] ?? species}
             </Text>
           </View>
+        )}
+        {isOwn && onDelete && (
+          <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
+            <Ionicons name="trash-outline" size={16} color="#D1D5DB" />
+          </TouchableOpacity>
         )}
       </View>
 

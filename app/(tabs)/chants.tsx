@@ -1,6 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, TextInput } from "react-native";
-import { useState, useMemo } from "react";
-import { useRouter } from "expo-router";
+import { useState, useMemo, useCallback, useRef } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useChants } from "../../hooks/useChants";
 import { useAuth } from "../../hooks/useAuth";
@@ -19,6 +19,12 @@ export default function ChantsScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const isMounted = useRef(false);
+
+  useFocusEffect(useCallback(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    refresh();
+  }, [refresh]));
 
   const filtered = useMemo(() => {
     if (!query.trim()) return songs;

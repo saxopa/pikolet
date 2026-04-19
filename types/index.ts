@@ -24,6 +24,7 @@ export interface Bird {
   lineage: string | null;
   status: BirdStatus;
   is_public: boolean;
+  image_url: string | null;
   father_id: string | null;
   mother_id: string | null;
   created_at: string;
@@ -101,6 +102,7 @@ export interface PostComment {
 export interface Follow {
   follower_id: string;
   following_id: string;
+  status: "pending" | "accepted";
   created_at: string;
 }
 

@@ -1,5 +1,5 @@
 import {
-  View, Text, ScrollView, TouchableOpacity, FlatList,
+  View, Text, ScrollView, TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -7,10 +7,11 @@ import { useEffect, useState, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   getProfileByUsername, getProfilePosts, getPublicBirds, getMySongs,
-  toggleFollow, isFollowing as checkFollowing,
+  getFollowStatus, sendFollowRequest, unfollowUser, deletePost,
 } from "../../lib/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import { useProfileStats } from "../../hooks/useProfileStats";
+import { usePostLike } from "../../hooks/usePostLike";
 import { Avatar } from "../../components/ui/Avatar";
 import { PostCard } from "../../components/feed/PostCard";
 import { BirdCard } from "../../components/bird/BirdCard";
@@ -21,6 +22,7 @@ import type { Profile, Bird, BirdSong } from "../../types";
 import type { FeedPost } from "../../hooks/useFeed";
 
 type Tab = "posts" | "birds" | "songs";
+type FollowStatus = "none" | "pending" | "accepted";
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: "posts", label: "Posts", icon: "grid-outline" },
@@ -45,7 +47,7 @@ export default function PublicProfileScreen() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [following, setFollowing] = useState(false);
+  const [followStatus, setFollowStatus] = useState<FollowStatus>("none");
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("posts");
   const [posts, setPosts] = useState<FeedPost[]>([]);
@@ -55,8 +57,8 @@ export default function PublicProfileScreen() {
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
 
   const stats = useProfileStats(profile?.id);
+  const likePost = usePostLike(user?.id, setPosts);
 
-  // Chargement profil + état follow
   useEffect(() => {
     async function load() {
       setLoadingProfile(true);
@@ -64,8 +66,8 @@ export default function PublicProfileScreen() {
       if (data) {
         setProfile(data as Profile);
         if (user) {
-          const { data: f } = await checkFollowing(user.id, data.id);
-          setFollowing(!!f);
+          const { data: f } = await getFollowStatus(user.id, data.id);
+          setFollowStatus(f ? (f.status as FollowStatus) : "none");
         }
       }
       setLoadingProfile(false);
@@ -73,7 +75,6 @@ export default function PublicProfileScreen() {
     load();
   }, [username, user]);
 
-  // Chargement contenu onglet
   const loadTab = useCallback(async (tab: Tab, profileId: string) => {
     setTabLoading(true);
     if (tab === "posts") {
@@ -95,11 +96,27 @@ export default function PublicProfileScreen() {
 
   async function handleFollow() {
     if (!user || !profile) return;
-    setFollowing(f => !f);
-    await toggleFollow(user.id, profile.id, following);
+    if (followStatus === "none") {
+      setFollowStatus("pending");
+      await sendFollowRequest(user.id, profile.id);
+    } else {
+      setFollowStatus("none");
+      await unfollowUser(user.id, profile.id);
+    }
+  }
+
+  async function handleDeletePost(postId: string) {
+    await deletePost(postId);
+    setPosts(prev => prev.filter(p => p.id !== postId));
   }
 
   const isSelf = user?.id === profile?.id;
+
+  const followLabel = followStatus === "accepted" ? "Abonné" : followStatus === "pending" ? "Demande envoyée" : "Suivre";
+  const followIcon = followStatus === "accepted" ? "checkmark" : followStatus === "pending" ? "time-outline" : "person-add-outline";
+  const followStyle = followStatus === "none" ? "border-accent bg-accent" : "border-gray-300 bg-white";
+  const followTextStyle = followStatus === "none" ? "text-white" : "text-gray-600";
+  const followIconColor = followStatus === "none" ? "white" : "#6B7280";
 
   const renderTabContent = () => {
     if (tabLoading) {
@@ -119,8 +136,9 @@ export default function PublicProfileScreen() {
               key={p.id}
               post={p}
               userId={user?.id}
-              onLike={() => {}}
+              onLike={() => likePost(p.id)}
               onComment={() => setCommentPostId(p.id)}
+              onDelete={isSelf ? handleDeletePost : undefined}
             />
           ))}
         </View>
@@ -161,7 +179,6 @@ export default function PublicProfileScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header profil */}
         {loadingProfile ? (
           <ProfileSkeleton />
         ) : !profile ? (
@@ -187,23 +204,16 @@ export default function PublicProfileScreen() {
             {!isSelf && user && (
               <TouchableOpacity
                 onPress={handleFollow}
-                className={`mt-4 flex-row items-center gap-1.5 px-6 py-2.5 rounded-full border ${following ? "border-gray-300 bg-white" : "border-accent bg-accent"}`}
+                className={`mt-4 flex-row items-center gap-1.5 px-6 py-2.5 rounded-full border ${followStyle}`}
                 activeOpacity={0.8}
               >
-                <Ionicons
-                  name={following ? "checkmark" : "person-add-outline"}
-                  size={14}
-                  color={following ? "#6B7280" : "white"}
-                />
-                <Text className={`text-sm font-semibold ${following ? "text-gray-600" : "text-white"}`}>
-                  {following ? "Abonné" : "Suivre"}
-                </Text>
+                <Ionicons name={followIcon as any} size={14} color={followIconColor} />
+                <Text className={`text-sm font-semibold ${followTextStyle}`}>{followLabel}</Text>
               </TouchableOpacity>
             )}
           </View>
         )}
 
-        {/* Stats */}
         {profile && (
           <View className="flex-row border-t border-b border-gray-100">
             {[
@@ -220,7 +230,6 @@ export default function PublicProfileScreen() {
           </View>
         )}
 
-        {/* Onglets */}
         {profile && (
           <>
             <View className="flex-row border-b border-gray-100">
