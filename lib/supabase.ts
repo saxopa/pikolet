@@ -45,7 +45,7 @@ export const getFeedPosts = (limit = 20, offset = 0) =>
     .from("posts")
     .select(`
       *,
-      author:profiles(id, username, display_name, avatar_url, location),
+      author:profiles!posts_author_id_fkey(id, username, display_name, avatar_url, location),
       post_songs(song:bird_songs(*, bird:birds(id, name, species))),
       post_likes(user_id)
     `)
