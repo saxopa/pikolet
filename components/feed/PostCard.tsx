@@ -27,6 +27,7 @@ const SPECIES_LABEL: Record<string, string> = { pikolet: "Pikolèt", lorti: "Lor
 export function PostCard({ post, userId, onLike, onComment }: Props) {
   const liked = post.post_likes.some(l => l.user_id === userId);
   const likeCount = post.post_likes.length;
+  const commentCount = post.post_comments?.[0]?.count ?? 0;
   const species = post.post_songs[0]?.song?.bird?.species;
   const router = useRouter();
 
@@ -71,11 +72,15 @@ export function PostCard({ post, userId, onLike, onComment }: Props) {
       <View className="flex-row gap-4 px-3.5 py-2.5 border-t border-gray-50">
         <TouchableOpacity onPress={onLike} className="flex-row items-center gap-1.5">
           <Ionicons name={liked ? "heart" : "heart-outline"} size={18} color={liked ? "#EF4444" : "#9CA3AF"} />
-          {likeCount > 0 && <Text className="text-xs text-gray-500">{likeCount}</Text>}
+          <Text className={`text-xs ${liked ? "text-red-400" : "text-gray-400"}`}>
+            {likeCount > 0 ? likeCount : "J'aime"}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onComment} className="flex-row items-center gap-1.5">
-          <Ionicons name="chatbubble-outline" size={16} color="#9CA3AF" />
-          <Text className="text-xs text-gray-500">Commenter</Text>
+          <Ionicons name={commentCount > 0 ? "chatbubble" : "chatbubble-outline"} size={16} color={commentCount > 0 ? "#1D9E75" : "#9CA3AF"} />
+          <Text className={`text-xs ${commentCount > 0 ? "text-accent" : "text-gray-400"}`}>
+            {commentCount > 0 ? commentCount : "Commenter"}
+          </Text>
         </TouchableOpacity>
         <View className="flex-1" />
         <TouchableOpacity className="flex-row items-center gap-1">

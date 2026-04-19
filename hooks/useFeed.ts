@@ -8,6 +8,7 @@ export type FeedPost = {
   author: { id: string; username: string; display_name: string | null; avatar_url: string | null; location: string | null };
   post_songs: Array<{ song: { id: string; title: string; song_type: string | null; source_type: string; youtube_url: string | null; storage_url: string | null; duration_seconds: number | null; play_count: number; bird: { id: string; name: string; species: string } } }>;
   post_likes: Array<{ user_id: string }>;
+  post_comments: Array<{ count: number }>;
 };
 
 const PAGE_SIZE = 12;

@@ -47,7 +47,8 @@ export const getFeedPosts = (limit = 20, offset = 0) =>
       *,
       author:profiles!posts_author_id_fkey(id, username, display_name, avatar_url, location),
       post_songs(song:bird_songs(*, bird:birds(id, name, species))),
-      post_likes(user_id)
+      post_likes(user_id),
+      post_comments(count)
     `)
     .eq("visibility", "public")
     .order("created_at", { ascending: false })
