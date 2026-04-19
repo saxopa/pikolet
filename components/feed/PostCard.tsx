@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "../ui/Avatar";
@@ -34,6 +34,12 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
   const router = useRouter();
 
   function confirmDelete() {
+    if (Platform.OS === "web") {
+      if ((window as any).confirm("Supprimer ce post ? Cette action est irréversible.")) {
+        onDelete?.(post.id);
+      }
+      return;
+    }
     Alert.alert("Supprimer ce post ?", "Cette action est irréversible.", [
       { text: "Annuler", style: "cancel" },
       { text: "Supprimer", style: "destructive", onPress: () => onDelete?.(post.id) },
@@ -63,7 +69,7 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
         )}
         {isOwn && onDelete && (
           <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
-            <Ionicons name="trash-outline" size={16} color="#D1D5DB" />
+            <Ionicons name="trash-outline" size={16} color="#9CA3AF" />
           </TouchableOpacity>
         )}
       </View>

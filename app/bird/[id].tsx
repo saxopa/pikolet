@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, Platform } from "react-native";
 import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { useCallback, useRef } from "react";
 import * as DocumentPicker from "expo-document-picker";
@@ -35,28 +35,34 @@ export default function BirdDetailScreen() {
   }, [refresh]));
 
   async function handleDeleteBird() {
+    const doDelete = async () => {
+      const { error } = await deleteBird(id);
+      if (error) toast(error.message, "error");
+      else { toast("Oiseau supprimé"); router.back(); }
+    };
+    if (Platform.OS === "web") {
+      if ((window as any).confirm("Supprimer cet oiseau ? Toutes ses données seront supprimées.")) doDelete();
+      return;
+    }
     Alert.alert("Supprimer cet oiseau ?", "Toutes ses données seront supprimées.", [
       { text: "Annuler", style: "cancel" },
-      {
-        text: "Supprimer", style: "destructive", onPress: async () => {
-          const { error } = await deleteBird(id);
-          if (error) toast(error.message, "error");
-          else { toast("Oiseau supprimé"); router.back(); }
-        }
-      },
+      { text: "Supprimer", style: "destructive", onPress: doDelete },
     ]);
   }
 
   async function handleDeleteSong(songId: string) {
+    const doDelete = async () => {
+      const { error } = await deleteSong(songId);
+      if (error) toast(error.message, "error");
+      else { toast("Chant supprimé"); refresh(); }
+    };
+    if (Platform.OS === "web") {
+      if ((window as any).confirm("Supprimer ce chant ? Cette action est irréversible.")) doDelete();
+      return;
+    }
     Alert.alert("Supprimer ce chant ?", "Cette action est irréversible.", [
       { text: "Annuler", style: "cancel" },
-      {
-        text: "Supprimer", style: "destructive", onPress: async () => {
-          const { error } = await deleteSong(songId);
-          if (error) toast(error.message, "error");
-          else { toast("Chant supprimé"); refresh(); }
-        }
-      },
+      { text: "Supprimer", style: "destructive", onPress: doDelete },
     ]);
   }
 

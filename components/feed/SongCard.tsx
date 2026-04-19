@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer } from "../audio/AudioPlayer";
 import type { SongWithMeta } from "../../hooks/useChants";
@@ -17,6 +17,12 @@ type Props = {
 
 export function SongCard({ song, onDelete }: Props) {
   function confirmDelete() {
+    if (Platform.OS === "web") {
+      if ((window as any).confirm("Supprimer ce chant ? Cette action est irréversible.")) {
+        onDelete?.(song.id);
+      }
+      return;
+    }
     Alert.alert("Supprimer ce chant ?", "Cette action est irréversible.", [
       { text: "Annuler", style: "cancel" },
       { text: "Supprimer", style: "destructive", onPress: () => onDelete?.(song.id) },
