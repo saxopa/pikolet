@@ -5,7 +5,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useBirdDetail } from "../../hooks/useVoliere";
 import { Badge } from "../../components/ui/Badge";
 import { AudioPlayer } from "../../components/audio/AudioPlayer";
-import { deleteBird, deleteSong, updateBird, uploadBirdImage } from "../../lib/supabase";
+import { deleteBird, deleteSong, updateBird, uploadBirdImage, deleteCompetition } from "../../lib/supabase";
 import { useToast } from "../../context/ToastContext";
 
 const STATUS_VARIANT = { en_forme: "green", mue: "amber", reproduction: "blue", entrainement: "green" } as const;
@@ -24,7 +24,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 export default function BirdDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { bird, logs, songs, loading, refresh } = useBirdDetail(id);
+  const { bird, logs, songs, competitions, loading, refresh } = useBirdDetail(id);
   const { toast } = useToast();
   const router = useRouter();
   const isMounted = useRef(false);
@@ -61,6 +61,22 @@ export default function BirdDetailScreen() {
       return;
     }
     Alert.alert("Supprimer ce chant ?", "Cette action est irréversible.", [
+      { text: "Annuler", style: "cancel" },
+      { text: "Supprimer", style: "destructive", onPress: doDelete },
+    ]);
+  }
+
+  async function handleDeleteCompetition(compId: string) {
+    const doDelete = async () => {
+      const { error } = await deleteCompetition(compId);
+      if (error) toast(error.message, "error");
+      else { toast("Résultat supprimé"); refresh(); }
+    };
+    if (Platform.OS === "web") {
+      if ((window as any).confirm("Supprimer ce résultat ? Cette action est irréversible.")) doDelete();
+      return;
+    }
+    Alert.alert("Supprimer ce résultat ?", "Cette action est irréversible.", [
       { text: "Annuler", style: "cancel" },
       { text: "Supprimer", style: "destructive", onPress: doDelete },
     ]);
@@ -159,6 +175,41 @@ export default function BirdDetailScreen() {
                     {log.weight_g ? ` · ${log.weight_g}g` : ""}
                   </Text>
                 </View>
+              </View>
+            ))
+          )}
+        </View>
+
+        <View className="mt-5">
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Palmarès</Text>
+            <TouchableOpacity
+              onPress={() => router.push(`/concours/new?birdId=${id}`)}
+              className="flex-row items-center gap-1 px-3 py-1.5 bg-accent-light rounded-full"
+            >
+              <Text className="text-xs text-accent-dark font-semibold">+ Ajouter</Text>
+            </TouchableOpacity>
+          </View>
+          {competitions.length === 0 ? (
+            <Text className="text-sm text-gray-400 italic">Aucun résultat de concours</Text>
+          ) : (
+            competitions.map(comp => (
+              <View key={comp.id} className="flex-row items-start gap-2.5 py-2.5 border-b border-gray-50">
+                <View className="w-8 h-8 rounded-[10px] bg-gray-100 items-center justify-center">
+                  <Text className="text-sm">
+                    {comp.rank === 1 ? "🥇" : comp.rank === 2 ? "🥈" : comp.rank === 3 ? "🥉" : "🏅"}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-semibold text-gray-800">{comp.name}</Text>
+                  <Text className="text-xs text-gray-400 mt-0.5">
+                    {comp.location ? `${comp.location} · ` : ""}
+                    {new Date(comp.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => handleDeleteCompetition(comp.id)} hitSlop={8} className="p-1">
+                  <Text className="text-gray-300 text-base">🗑</Text>
+                </TouchableOpacity>
               </View>
             ))
           )}

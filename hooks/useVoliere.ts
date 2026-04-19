@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { getMyBirds, getBird, getBirdLogs, getBirdSongs } from "../lib/supabase";
-import type { Bird, BirdLog, BirdSong } from "../types";
+import { getMyBirds, getBird, getBirdLogs, getBirdSongs, getBirdCompetitions } from "../lib/supabase";
+import type { Bird, BirdLog, BirdSong, Competition } from "../types";
 
 export function useVoliere(ownerId?: string) {
   const [birds, setBirds] = useState<Bird[]>([]);
@@ -23,22 +23,25 @@ export function useBirdDetail(birdId: string) {
   const [bird, setBird] = useState<Bird | null>(null);
   const [logs, setLogs] = useState<BirdLog[]>([]);
   const [songs, setSongs] = useState<BirdSong[]>([]);
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
-    const [birdRes, logsRes, songsRes] = await Promise.all([
+    const [birdRes, logsRes, songsRes, compsRes] = await Promise.all([
       getBird(birdId),
       getBirdLogs(birdId),
       getBirdSongs(birdId),
+      getBirdCompetitions(birdId),
     ]);
     if (birdRes.data) setBird(birdRes.data as unknown as Bird);
     if (logsRes.data) setLogs(logsRes.data as BirdLog[]);
     if (songsRes.data) setSongs(songsRes.data as unknown as BirdSong[]);
+    if (compsRes.data) setCompetitions(compsRes.data as Competition[]);
     setLoading(false);
   }, [birdId]);
 
   useEffect(() => { load(); }, [load]);
 
-  return { bird, logs, songs, loading, refresh: () => load(true) };
+  return { bird, logs, songs, competitions, loading, refresh: () => load(true) };
 }
