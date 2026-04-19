@@ -1,11 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../context/ToastContext";
 import { upsertProfile } from "../../lib/supabase";
 
 export default function EditProfileScreen() {
-  const { profile, user } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
   const [bio, setBio] = useState(profile?.bio ?? "");
@@ -30,8 +32,13 @@ export default function EditProfileScreen() {
       location: location.trim() || null,
     });
     setLoading(false);
-    if (error) Alert.alert("Erreur", error.message);
-    else { Alert.alert("✓ Profil mis à jour"); router.back(); }
+    if (error) {
+      toast(error.message, "error");
+    } else {
+      await refreshProfile();
+      toast("Profil mis à jour ✓");
+      router.back();
+    }
   }
 
   return (

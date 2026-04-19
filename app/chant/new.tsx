@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../context/ToastContext";
 import { getMyBirds, addSong } from "../../lib/supabase";
 import type { Bird, SongType } from "../../types";
 
@@ -12,8 +13,11 @@ const SONG_TYPES: { key: SongType; label: string }[] = [
   { key: "stimulation", label: "Stimulation" },
 ];
 
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+
 export default function NewSongScreen() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [birds, setBirds] = useState<Bird[]>([]);
   const [selectedBird, setSelectedBird] = useState<string>("");
@@ -33,9 +37,9 @@ export default function NewSongScreen() {
   }, [user]);
 
   async function handleSave() {
-    if (!title.trim()) { Alert.alert("Titre requis"); return; }
-    if (!selectedBird) { Alert.alert("Sélectionne un oiseau"); return; }
-    if (!youtubeUrl.trim()) { Alert.alert("Lien YouTube requis", "L'upload de fichier audio arrive bientôt."); return; }
+    if (!title.trim()) { toast("Titre requis", "error"); return; }
+    if (!selectedBird) { toast("Sélectionne un oiseau", "error"); return; }
+    if (!youtubeUrl.trim()) { toast("Lien YouTube requis", "error"); return; }
     if (!user) return;
     setLoading(true);
     const { error } = await addSong({
@@ -51,8 +55,12 @@ export default function NewSongScreen() {
       recorded_at: null,
     });
     setLoading(false);
-    if (error) Alert.alert("Erreur", error.message);
-    else { Alert.alert("✓ Chant ajouté !"); router.back(); }
+    if (error) {
+      toast(error.message, "error");
+    } else {
+      toast("Chant ajouté ✓");
+      router.back();
+    }
   }
 
   return (
@@ -73,7 +81,9 @@ export default function NewSongScreen() {
                   onPress={() => setSelectedBird(b.id)}
                   className={`px-3.5 py-2 rounded-full border ${selectedBird === b.id ? "border-accent bg-accent-light" : "border-gray-200"}`}
                 >
-                  <Text className={`text-sm ${selectedBird === b.id ? "text-accent-dark font-medium" : "text-gray-600"}`}>🐦 {b.name}</Text>
+                  <Text className={`text-sm ${selectedBird === b.id ? "text-accent-dark font-medium" : "text-gray-600"}`}>
+                    {SPECIES_EMOJI[b.species] ?? "🐦"} {b.name}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>

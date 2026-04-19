@@ -16,6 +16,8 @@ const STATUS_LABEL = {
   entrainement: "Entraînement",
 };
 
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+
 type Props = { bird: Bird; onPress: () => void };
 
 export function BirdCard({ bird, onPress }: Props) {
@@ -25,7 +27,7 @@ export function BirdCard({ bird, onPress }: Props) {
       className="bg-white border border-gray-100 rounded-2xl p-3.5"
       activeOpacity={0.85}
     >
-      <Text className="text-3xl mb-2">🐦</Text>
+      <Text className="text-3xl mb-2">{SPECIES_EMOJI[bird.species] ?? "🐦"}</Text>
       <Text className="text-sm font-semibold text-gray-900">{bird.name}</Text>
       <Text className="text-[11px] text-gray-500 mb-2">
         {bird.species === "pikolet" ? "Pikolèt" : "Lorti"} · {bird.gender === "male" ? "Mâle" : "Femelle"}

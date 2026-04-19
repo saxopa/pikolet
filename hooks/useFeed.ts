@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getFeedPosts, toggleLike } from "../lib/supabase";
 
 export type FeedPost = {
@@ -10,20 +10,33 @@ export type FeedPost = {
   post_likes: Array<{ user_id: string }>;
 };
 
+const PAGE_SIZE = 12;
+
 export function useFeed(userId?: string) {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const offsetRef = useRef(0);
 
-  const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    const { data, error } = await getFeedPosts();
-    if (!error && data) setPosts(data as unknown as FeedPost[]);
+  const loadPage = useCallback(async (reset: boolean) => {
+    if (reset) { offsetRef.current = 0; setLoading(true); }
+    else setLoadingMore(true);
+    const { data, error } = await getFeedPosts(PAGE_SIZE, offsetRef.current);
+    if (!error && data) {
+      const next = data as unknown as FeedPost[];
+      if (reset) setPosts(next);
+      else setPosts(prev => [...prev, ...next]);
+      setHasMore(next.length === PAGE_SIZE);
+      offsetRef.current += next.length;
+    }
     setLoading(false);
+    setLoadingMore(false);
     setRefreshing(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadPage(true); }, [loadPage]);
 
   const like = useCallback(async (postId: string) => {
     if (!userId) return;
@@ -39,5 +52,10 @@ export function useFeed(userId?: string) {
     await toggleLike(postId, userId, liked);
   }, [posts, userId]);
 
-  return { posts, loading, refreshing, refresh: () => { setRefreshing(true); load(true); }, like };
+  return {
+    posts, loading, refreshing, loadingMore, hasMore,
+    refresh: () => { setRefreshing(true); loadPage(true); },
+    loadMore: () => { if (!loadingMore && hasMore) loadPage(false); },
+    like,
+  };
 }

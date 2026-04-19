@@ -1,20 +1,34 @@
-import { View, Text, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, TextInput } from "react-native";
+import { useState, useMemo } from "react";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useChants } from "../../hooks/useChants";
 import { useAuth } from "../../hooks/useAuth";
 import { SongCard } from "../../components/feed/SongCard";
 import { EmptyState } from "../../components/ui/EmptyState";
+import { SkeletonPostCard } from "../../components/ui/SkeletonPostCard";
 
 const TABS = [
   { key: "all", label: "Tous" },
-  { key: "pikolet", label: "Pikolèt" },
-  { key: "lorti", label: "Lorti" },
+  { key: "pikolet", label: "🐤 Pikolèt" },
+  { key: "lorti", label: "🦜 Lorti" },
 ] as const;
 
 export default function ChantsScreen() {
   const { songs, filter, setFilter, loading, refresh } = useChants();
   const { user } = useAuth();
   const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return songs;
+    const q = query.toLowerCase();
+    return songs.filter(s =>
+      s.title.toLowerCase().includes(q) ||
+      (s.bird as any)?.name?.toLowerCase().includes(q) ||
+      (s.owner as any)?.username?.toLowerCase().includes(q)
+    );
+  }, [songs, query]);
 
   return (
     <View className="flex-1 bg-white">
@@ -28,13 +42,22 @@ export default function ChantsScreen() {
             onPress={() => router.push("/chant/new")}
             className="w-8 h-8 rounded-full bg-accent items-center justify-center"
           >
-            <Text className="text-white text-xl font-light">+</Text>
+            <Ionicons name="add" size={20} color="white" />
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Filtres */}
-      <View className="flex-row border-b border-gray-100 mx-0">
+      <View className="px-5 pb-2">
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Rechercher un chant…"
+          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+          placeholderTextColor="#9CA3AF"
+        />
+      </View>
+
+      <View className="flex-row border-b border-gray-100">
         {TABS.map(tab => (
           <TouchableOpacity
             key={tab.key}
@@ -48,18 +71,26 @@ export default function ChantsScreen() {
         ))}
       </View>
 
-      <FlatList
-        data={songs}
-        keyExtractor={s => s.id}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} tintColor="#1D9E75" />}
-        ListEmptyComponent={
-          loading ? null : (
-            <EmptyState icon="🎵" title="Aucun chant" subtitle="Sois le premier à partager un enregistrement" />
-          )
-        }
-        renderItem={({ item }) => <SongCard song={item} />}
-      />
+      {loading ? (
+        <View className="px-4 pt-2">
+          {[1, 2, 3].map(i => <SkeletonPostCard key={i} />)}
+        </View>
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={s => s.id}
+          contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+          refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} tintColor="#1D9E75" />}
+          ListEmptyComponent={
+            <EmptyState
+              icon="🎵"
+              title={query ? "Aucun résultat" : "Aucun chant"}
+              subtitle={query ? "Essaie un autre terme" : "Sois le premier à partager un enregistrement"}
+            />
+          }
+          renderItem={({ item }) => <SongCard song={item} />}
+        />
+      )}
     </View>
   );
 }

@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { addBirdLog } from "../../../lib/supabase";
+import { useToast } from "../../../context/ToastContext";
 import type { LogType } from "../../../types";
 
 const LOG_TYPES: { key: LogType; label: string; icon: string }[] = [
@@ -15,6 +16,7 @@ const LOG_TYPES: { key: LogType; label: string; icon: string }[] = [
 export default function AddLogScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { toast } = useToast();
   const [type, setType] = useState<LogType>("entrainement");
   const [note, setNote] = useState("");
   const [weight, setWeight] = useState("");
@@ -30,8 +32,12 @@ export default function AddLogScreen() {
       logged_at: new Date().toISOString(),
     });
     setLoading(false);
-    if (error) Alert.alert("Erreur", error.message);
-    else { Alert.alert("✓ Entrée ajoutée"); router.back(); }
+    if (error) {
+      toast(error.message, "error");
+    } else {
+      toast("Entrée ajoutée ✓");
+      router.back();
+    }
   }
 
   return (

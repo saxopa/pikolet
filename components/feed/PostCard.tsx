@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "../ui/Avatar";
 import { AudioPlayer } from "../audio/AudioPlayer";
 import type { FeedPost } from "../../hooks/useFeed";
@@ -13,19 +14,24 @@ type Props = {
 
 function timeAgo(date: string) {
   const diff = (Date.now() - new Date(date).getTime()) / 1000;
+  if (diff < 60) return "À l'instant";
   if (diff < 3600) return `Il y a ${Math.floor(diff / 60)}min`;
   if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)}h`;
-  return `Il y a ${Math.floor(diff / 86400)}j`;
+  if (diff < 7 * 86400) return `Il y a ${Math.floor(diff / 86400)}j`;
+  return new Date(date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
+
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+const SPECIES_LABEL: Record<string, string> = { pikolet: "Pikolèt", lorti: "Lorti" };
 
 export function PostCard({ post, userId, onLike, onComment }: Props) {
   const liked = post.post_likes.some(l => l.user_id === userId);
+  const likeCount = post.post_likes.length;
   const species = post.post_songs[0]?.song?.bird?.species;
   const router = useRouter();
 
   return (
     <View className="bg-white border border-gray-100 rounded-2xl mb-3 overflow-hidden">
-      {/* Header */}
       <View className="flex-row items-center gap-2.5 px-3.5 pt-3 pb-2">
         <TouchableOpacity onPress={() => router.push(`/profile/${post.author.username}`)}>
           <Avatar uri={post.author.avatar_url} name={post.author.display_name ?? post.author.username} size={36} />
@@ -41,13 +47,12 @@ export function PostCard({ post, userId, onLike, onComment }: Props) {
         {species && (
           <View className={`px-2.5 py-1 rounded-full ${species === "pikolet" ? "bg-accent-light" : "bg-blue-50"}`}>
             <Text className={`text-[11px] font-semibold ${species === "pikolet" ? "text-accent-dark" : "text-blue-700"}`}>
-              {species === "pikolet" ? "Pikolèt" : "Lorti"}
+              {SPECIES_EMOJI[species]} {SPECIES_LABEL[species] ?? species}
             </Text>
           </View>
         )}
       </View>
 
-      {/* Contenu */}
       <View className="px-3.5 pb-3">
         {post.content && (
           <Text className="text-[13px] text-gray-600 leading-5 mb-2.5">{post.content}</Text>
@@ -63,16 +68,13 @@ export function PostCard({ post, userId, onLike, onComment }: Props) {
         ))}
       </View>
 
-      {/* Actions */}
       <View className="flex-row gap-4 px-3.5 py-2.5 border-t border-gray-50">
         <TouchableOpacity onPress={onLike} className="flex-row items-center gap-1.5">
-          <Text className={`text-base ${liked ? "text-red-500" : "text-gray-400"}`}>
-            {liked ? "♥" : "♡"}
-          </Text>
-          <Text className="text-xs text-gray-500">{post.post_likes.length}</Text>
+          <Ionicons name={liked ? "heart" : "heart-outline"} size={18} color={liked ? "#EF4444" : "#9CA3AF"} />
+          {likeCount > 0 && <Text className="text-xs text-gray-500">{likeCount}</Text>}
         </TouchableOpacity>
         <TouchableOpacity onPress={onComment} className="flex-row items-center gap-1.5">
-          <Text className="text-base text-gray-400">💬</Text>
+          <Ionicons name="chatbubble-outline" size={16} color="#9CA3AF" />
           <Text className="text-xs text-gray-500">Commenter</Text>
         </TouchableOpacity>
         <View className="flex-1" />

@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 import { useProfileStats } from "../../hooks/useProfileStats";
 import { Avatar } from "../../components/ui/Avatar";
+import { useToast } from "../../context/ToastContext";
 import { signOut } from "../../lib/supabase";
 import { useRouter } from "expo-router";
 
@@ -19,6 +20,7 @@ function Stat({ value, label }: StatProps) {
 export default function ProfilScreen() {
   const { profile, user, isAuthenticated } = useAuth();
   const stats = useProfileStats(user?.id);
+  const { toast } = useToast();
   const router = useRouter();
 
   if (!isAuthenticated) {
@@ -46,10 +48,8 @@ export default function ProfilScreen() {
   }
 
   async function handleSignOut() {
-    Alert.alert("Déconnexion", "Tu veux te déconnecter ?", [
-      { text: "Annuler", style: "cancel" },
-      { text: "Déconnexion", style: "destructive", onPress: () => signOut() },
-    ]);
+    await signOut();
+    toast("Déconnexion réussie", "info");
   }
 
   return (
@@ -59,6 +59,9 @@ export default function ProfilScreen() {
         <Text className="text-lg font-semibold text-gray-900 mt-3">
           {profile?.display_name ?? profile?.username ?? "Mon profil"}
         </Text>
+        {profile?.username && (
+          <Text className="text-[12px] text-gray-400 mt-0.5">@{profile.username}</Text>
+        )}
         {profile?.bio && (
           <Text className="text-sm text-gray-500 text-center mt-1.5 leading-5">{profile.bio}</Text>
         )}
@@ -67,7 +70,6 @@ export default function ProfilScreen() {
         )}
       </View>
 
-      {/* Stats */}
       <View className="flex-row border-t border-b border-gray-100 mx-0">
         <Stat value={stats?.bird_count ?? "—"} label="oiseaux" />
         <View className="w-px bg-gray-100" />
@@ -78,7 +80,6 @@ export default function ProfilScreen() {
         <Stat value={stats?.win_count ?? "—"} label="victoires" />
       </View>
 
-      {/* Actions */}
       <View className="px-5 mt-6 gap-3">
         <TouchableOpacity
           onPress={() => router.push("/auth/edit-profile")}

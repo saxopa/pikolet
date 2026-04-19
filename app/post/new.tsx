@@ -1,12 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../context/ToastContext";
 import { createPost, linkSongToPost, getMySongs } from "../../lib/supabase";
 import type { BirdSong } from "../../types";
 
 export default function NewPostScreen() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [content, setContent] = useState("");
   const [songs, setSongs] = useState<BirdSong[]>([]);
@@ -19,14 +21,18 @@ export default function NewPostScreen() {
   }, [user]);
 
   async function handlePost() {
-    if (!content.trim() && !selectedSong) { Alert.alert("Post vide", "Ajoute du texte ou un chant."); return; }
+    if (!content.trim() && !selectedSong) { toast("Ajoute du texte ou un chant.", "error"); return; }
     if (!user) return;
     setLoading(true);
     const { data, error } = await createPost(user.id, content.trim());
-    if (error || !data) { Alert.alert("Erreur", error?.message); setLoading(false); return; }
+    if (error || !data) {
+      toast(error?.message ?? "Erreur lors de la publication", "error");
+      setLoading(false);
+      return;
+    }
     if (selectedSong) await linkSongToPost(data.id, selectedSong);
     setLoading(false);
-    Alert.alert("✓ Post publié !");
+    toast("Post publié ✓");
     router.back();
   }
 

@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../context/ToastContext";
 import { createBird } from "../../lib/supabase";
 import type { BirdSpecies, BirdGender, BirdStatus } from "../../types";
 
@@ -26,6 +27,7 @@ function Picker<T extends string>({ label, options, value, onChange }: { label: 
 
 export default function NewBirdScreen() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [name, setName] = useState("");
   const [species, setSpecies] = useState<BirdSpecies>("pikolet");
@@ -36,8 +38,8 @@ export default function NewBirdScreen() {
   const [loading, setLoading] = useState(false);
 
   async function handleCreate() {
-    if (!name.trim()) { Alert.alert("Nom requis"); return; }
-    if (!user) { Alert.alert("Non connecté"); return; }
+    if (!name.trim()) { toast("Nom requis", "error"); return; }
+    if (!user) { toast("Non connecté", "error"); return; }
     setLoading(true);
     const { error } = await createBird({
       owner_id: user.id, name: name.trim(), species, gender,
@@ -46,8 +48,12 @@ export default function NewBirdScreen() {
       is_public: true, birth_date: null, father_id: null, mother_id: null,
     });
     setLoading(false);
-    if (error) Alert.alert("Erreur", error.message);
-    else { Alert.alert("✓ Oiseau ajouté !"); router.back(); }
+    if (error) {
+      toast(error.message, "error");
+    } else {
+      toast("Oiseau ajouté ✓");
+      router.back();
+    }
   }
 
   return (
@@ -58,7 +64,7 @@ export default function NewBirdScreen() {
           <TextInput value={name} onChangeText={setName} placeholder="Ex: Prodige" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />
         </View>
 
-        <Picker label="Espèce *" value={species} onChange={setSpecies} options={[{ key: "pikolet", label: "Pikolèt" }, { key: "lorti", label: "Lorti" }]} />
+        <Picker label="Espèce *" value={species} onChange={setSpecies} options={[{ key: "pikolet", label: "🐤 Pikolèt" }, { key: "lorti", label: "🦜 Lorti" }]} />
         <Picker label="Sexe *" value={gender} onChange={setGender} options={[{ key: "male", label: "Mâle" }, { key: "femelle", label: "Femelle" }]} />
         <Picker label="Statut" value={status} onChange={setStatus} options={[
           { key: "en_forme", label: "En forme" }, { key: "mue", label: "Mue" },
