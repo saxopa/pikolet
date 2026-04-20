@@ -11,6 +11,24 @@ import { SkeletonBirdCard } from "../../components/ui/SkeletonBirdCard";
 export default function VoliereScreen() {
   const { user, isAuthenticated } = useAuth();
   const { birds, loading, refresh } = useVoliere(user?.id);
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const isMounted = useRef(false);
+
+  useFocusEffect(useCallback(() => {
+    if (!isMounted.current) { isMounted.current = true; return; }
+    refresh();
+  }, [refresh]));
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return birds;
+    const q = query.toLowerCase();
+    return birds.filter(b =>
+      b.name.toLowerCase().includes(q) ||
+      b.species.toLowerCase().includes(q) ||
+      (b.ring_code ?? "").toLowerCase().includes(q)
+    );
+  }, [birds, query]);
 
   if (!isAuthenticated) {
     return (
@@ -35,24 +53,6 @@ export default function VoliereScreen() {
       </View>
     );
   }
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const isMounted = useRef(false);
-
-  useFocusEffect(useCallback(() => {
-    if (!isMounted.current) { isMounted.current = true; return; }
-    refresh();
-  }, [refresh]));
-
-  const filtered = useMemo(() => {
-    if (!query.trim()) return birds;
-    const q = query.toLowerCase();
-    return birds.filter(b =>
-      b.name.toLowerCase().includes(q) ||
-      b.species.toLowerCase().includes(q) ||
-      (b.ring_code ?? "").toLowerCase().includes(q)
-    );
-  }, [birds, query]);
 
   return (
     <View className="flex-1 bg-gray-50">

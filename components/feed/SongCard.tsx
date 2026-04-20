@@ -23,7 +23,16 @@ export function SongCard({ song, onDelete }: Props) {
   const localUri = getLocalUri(song.id);
   const downloaded = isDownloaded(song.id);
   const downloading = isDownloading(song.id);
-  const canDownload = Platform.OS !== "web" && !!song.storage_url && !song.youtube_url;
+  const canDownload = !!song.storage_url && !song.youtube_url;
+
+  function handleWebDownload() {
+    const a = document.createElement("a");
+    a.href = song.storage_url!;
+    a.download = song.title + ".mp3";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 
   function confirmDelete() {
     if (Platform.OS === "web") {
@@ -71,7 +80,11 @@ export function SongCard({ song, onDelete }: Props) {
             </View>
           )}
           {canDownload && (
-            downloading ? (
+            Platform.OS === "web" ? (
+              <TouchableOpacity onPress={handleWebDownload} hitSlop={8}>
+                <Ionicons name="arrow-down-circle-outline" size={18} color="#C8B49E" />
+              </TouchableOpacity>
+            ) : downloading ? (
               <ActivityIndicator size={14} color="#C8B49E" />
             ) : (
               <TouchableOpacity
