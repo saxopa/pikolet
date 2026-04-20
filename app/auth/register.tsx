@@ -49,16 +49,25 @@ export default function RegisterScreen() {
     setLoading(false);
 
     if (error) {
-      const msg = error.message.includes("already registered")
-        ? "Cet email est déjà utilisé."
-        : error.message;
+      let msg = "Une erreur est survenue, réessaie plus tard.";
+      if (error.message.includes("already registered") || error.message.includes("User already registered")) {
+        msg = "Cet email est déjà utilisé.";
+      } else if (error.message.includes("rate limit") || error.message.includes("only request this after") || error.status === 429) {
+        msg = "Trop de tentatives. Attends une minute avant de réessayer.";
+      } else if (error.message.includes("invalid email") || error.message.includes("Invalid email")) {
+        msg = "L'adresse email n'est pas valide.";
+      } else if (error.message.includes("Password should be")) {
+        msg = "Le mot de passe est trop faible. Utilise au moins 6 caractères.";
+      } else if (error.message.includes("duplicate") || error.message.includes("unique")) {
+        msg = "Ce pseudo est déjà pris, choisis-en un autre.";
+      }
       Alert.alert("Erreur inscription", msg);
       return;
     }
 
     Alert.alert(
-      "Bienvenue ! 🐦",
-      "Compte créé. Vérifie ton email pour confirmer, puis connecte-toi.",
+      "Compte créé ! 🐦",
+      "Un email de confirmation t'a été envoyé.\n\n1. Ouvre ton email\n2. Clique sur le lien de confirmation\n3. Reviens ici et connecte-toi",
       [{ text: "Se connecter", onPress: () => router.replace("/auth/login") }]
     );
   }

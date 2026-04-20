@@ -19,6 +19,7 @@ function NavigationStack() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth/login" options={{ title: "Connexion", headerBackTitle: "" }} />
       <Stack.Screen name="auth/register" options={{ title: "Créer un compte", headerBackTitle: "" }} />
+      <Stack.Screen name="auth/confirm" options={{ headerShown: false }} />
       <Stack.Screen name="auth/edit-profile" options={{ title: "Mon profil", headerBackTitle: "" }} />
       <Stack.Screen name="bird/[id]" options={{ title: "", headerBackTitle: "Volière" }} />
       <Stack.Screen name="bird/new" options={{ title: "Nouvel oiseau", headerBackTitle: "" }} />

@@ -23,7 +23,14 @@ export const signUpWithEmail = (
   supabase.auth.signUp({
     email,
     password,
-    options: { data: { username: meta.username, location: meta.location ?? null } },
+    options: {
+      data: { username: meta.username, location: meta.location ?? null },
+      // Redirige vers la page web GitHub Pages après confirmation.
+      // Le SDK Supabase JS détecte automatiquement le hash #access_token=...
+      // et établit la session. Sur mobile, le lien s'ouvre dans le navigateur
+      // et la PWA prend le relais.
+      emailRedirectTo: "https://saxopa.github.io/pikolet/auth/confirm",
+    },
   });
 
 export const signOut = () => supabase.auth.signOut();

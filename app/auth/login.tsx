@@ -3,7 +3,7 @@ import {
   KeyboardAvoidingView, Platform,
 } from "react-native";
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { signInWithEmail } from "../../lib/supabase";
 
 const ERROR_MAP: Record<string, string> = {
@@ -17,6 +17,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const params = useLocalSearchParams<{ confirm_error?: string }>();
+
+  // Message renvoyé par auth/confirm si le lien était expiré
+  const confirmError = params.confirm_error;
 
   async function handleLogin() {
     if (!email.trim() || !password) {
@@ -45,6 +49,13 @@ export default function LoginScreen() {
         <Text className="text-[30px] font-bold text-accent-dark font-display">Pikolèt</Text>
         <Text className="text-sm text-accent mt-2 font-medium">Communauté éleveurs</Text>
       </View>
+
+      {/* Bandeau d'erreur si le lien de confirmation était expiré */}
+      {confirmError ? (
+        <View className="mx-6 mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
+          <Text className="text-sm text-red-700 text-center">{confirmError}</Text>
+        </View>
+      ) : null}
 
       {/* White form card */}
       <View
