@@ -27,11 +27,13 @@ export default function MarcheScreen() {
   const { listings, category, changeCategory, loading, error, refresh } = useListings();
   const [query, setQuery] = useState("");
   const isMounted = useRef(false);
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
 
   useFocusEffect(useCallback(() => {
     if (!isMounted.current) { isMounted.current = true; return; }
-    refresh();
-  }, [refresh]));
+    refreshRef.current();
+  }, []));
 
   const filtered = useMemo(() => {
     if (!query.trim()) return listings;

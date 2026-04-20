@@ -27,7 +27,9 @@ export function useListings() {
     setCategory(cat);
   }, []);
 
-  return { listings, category, changeCategory, loading, error, refresh: () => load(category) };
+  const refresh = useCallback(() => load(category), [load, category]);
+
+  return { listings, category, changeCategory, loading, error, refresh };
 }
 
 export function useMyListings(sellerId?: string) {
