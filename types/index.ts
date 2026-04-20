@@ -121,6 +121,25 @@ export interface Follow {
   created_at: string;
 }
 
+export type ListingCategory = "oiseau" | "materiel" | "nourriture" | "autre";
+export type ListingPriceType = "fixed" | "negotiable" | "free";
+export type ListingStatus = "active" | "sold" | "reserved";
+
+export interface Listing {
+  id: string;
+  seller_id: string;
+  title: string;
+  description: string | null;
+  category: ListingCategory;
+  price: number | null;
+  price_type: ListingPriceType;
+  location: string | null;
+  status: ListingStatus;
+  bird_id: string | null;
+  image_url: string | null;
+  created_at: string;
+}
+
 // Jointures fréquentes
 export type SongWithBird = BirdSong & { bird: Bird };
 export type PostWithAuthor = Post & { author: Profile };

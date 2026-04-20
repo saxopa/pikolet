@@ -60,6 +60,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="marche"
+        options={{
+          title: "Marché",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="storefront-outline" activeIcon="storefront" color={color} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profil"
         options={{
           title: "Profil",

@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "../types/database";
+import type { Database, Enums } from "../types/database";
 import type { Post, Bird, BirdSong, Profile, BirdLog, Competition } from "../types";
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -256,6 +256,52 @@ export const getBirdCompetitions = (birdId: string) =>
 
 export const deleteCompetition = (compId: string) =>
   supabase.from("competitions").delete().eq("id", compId);
+
+// ─── Marketplace ────────────────────────────────────────────────────────────
+
+export const getListings = (category?: string) => {
+  let q = supabase
+    .from("listings")
+    .select("*, seller:profiles(id, username, display_name, avatar_url, location)")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (category && category !== "all") q = q.eq("category", category as Enums<"listing_category">);
+  return q;
+};
+
+export const getMyListings = (sellerId: string) =>
+  supabase
+    .from("listings")
+    .select("*")
+    .eq("seller_id", sellerId)
+    .order("created_at", { ascending: false });
+
+export const getListing = (id: string) =>
+  supabase
+    .from("listings")
+    .select("*, seller:profiles(id, username, display_name, avatar_url, location)")
+    .eq("id", id)
+    .single();
+
+export const createListing = (listing: {
+  seller_id: string;
+  title: string;
+  description?: string;
+  category: Enums<"listing_category">;
+  price?: number;
+  price_type: Enums<"listing_price_type">;
+  location?: string;
+  bird_id?: string;
+  image_url?: string;
+}) =>
+  supabase.from("listings").insert(listing).select().single();
+
+export const updateListingStatus = (id: string, status: Enums<"listing_status">) =>
+  supabase.from("listings").update({ status }).eq("id", id);
+
+export const deleteListing = (id: string) =>
+  supabase.from("listings").delete().eq("id", id);
 
 // ─── Storage post media ──────────────────────────────────────────────────────
 
