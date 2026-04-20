@@ -72,7 +72,7 @@ export function CommentsSheet({ postId, userId, visible, onClose }: Props) {
               onChangeText={setText}
               placeholder="Ajoute un commentaire…"
               className="flex-1 bg-gray-100 rounded-full px-4 py-2.5 text-sm"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#A08878"
               returnKeyType="send"
               onSubmitEditing={send}
             />

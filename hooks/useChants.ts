@@ -11,11 +11,14 @@ export function useChants() {
   const [songs, setSongs] = useState<SongWithMeta[]>([]);
   const [filter, setFilter] = useState<BirdSpecies | "all">("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await getPublicSongs();
-    if (data) setSongs(data as unknown as SongWithMeta[]);
+    setError(false);
+    const { data, error: err } = await getPublicSongs();
+    if (err) setError(true);
+    else if (data) setSongs(data as unknown as SongWithMeta[]);
     setLoading(false);
   }, []);
 
@@ -25,5 +28,5 @@ export function useChants() {
     ? songs
     : songs.filter(s => s.bird?.species === filter);
 
-  return { songs: filtered, filter, setFilter, loading, refresh: load };
+  return { songs: filtered, filter, setFilter, loading, error, refresh: load };
 }

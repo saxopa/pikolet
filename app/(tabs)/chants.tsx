@@ -15,7 +15,7 @@ const TABS = [
 ] as const;
 
 export default function ChantsScreen() {
-  const { songs, filter, setFilter, loading, refresh } = useChants();
+  const { songs, filter, setFilter, loading, error, refresh } = useChants();
   const { user } = useAuth();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -77,11 +77,21 @@ export default function ChantsScreen() {
         ))}
       </View>
 
-      {loading ? (
+      {error && (
+        <View className="flex-1 items-center justify-center gap-3">
+          <Text className="text-3xl">📡</Text>
+          <Text className="text-sm text-gray-500">Impossible de charger les chants</Text>
+          <TouchableOpacity onPress={refresh} className="px-5 py-2 bg-accent rounded-xl">
+            <Text className="text-white text-sm font-semibold">Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!error && loading ? (
         <View className="px-4 pt-2">
           {[1, 2, 3].map(i => <SkeletonPostCard key={i} />)}
         </View>
-      ) : (
+      ) : !error && (
         <FlatList
           data={filtered}
           keyExtractor={s => s.id}

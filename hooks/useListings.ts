@@ -10,22 +10,24 @@ export function useListings() {
   const [listings, setListings] = useState<ListingWithSeller[]>([]);
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const load = useCallback(async (cat = category) => {
+  const load = useCallback(async (cat: string) => {
     setLoading(true);
-    const { data } = await getListings(cat);
-    if (data) setListings(data as unknown as ListingWithSeller[]);
+    setError(false);
+    const { data, error: err } = await getListings(cat);
+    if (err) setError(true);
+    else if (data) setListings(data as unknown as ListingWithSeller[]);
     setLoading(false);
-  }, [category]);
+  }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(category); }, [load, category]);
 
   const changeCategory = useCallback((cat: string) => {
     setCategory(cat);
-    load(cat);
-  }, [load]);
+  }, []);
 
-  return { listings, category, changeCategory, loading, refresh: load };
+  return { listings, category, changeCategory, loading, error, refresh: () => load(category) };
 }
 
 export function useMyListings(sellerId?: string) {

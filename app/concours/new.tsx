@@ -88,7 +88,7 @@ export default function NewConcoursScreen() {
             onChangeText={setName}
             placeholder="Ex: Concours régional 2025"
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
           />
         </View>
 
@@ -99,7 +99,7 @@ export default function NewConcoursScreen() {
             onChangeText={setLocation}
             placeholder="Ex: Fort-de-France"
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
           />
         </View>
 
@@ -110,7 +110,7 @@ export default function NewConcoursScreen() {
             onChangeText={setDate}
             placeholder="YYYY-MM-DD"
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
             keyboardType="numbers-and-punctuation"
           />
         </View>
@@ -136,7 +136,7 @@ export default function NewConcoursScreen() {
               onChangeText={setCustomRank}
               placeholder="Ex: 5"
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm mt-2"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#A08878"
               keyboardType="number-pad"
             />
           )}
@@ -168,7 +168,7 @@ export default function NewConcoursScreen() {
             onChangeText={setNotes}
             placeholder="Observations, conditions…"
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
             multiline
             numberOfLines={3}
             textAlignVertical="top"

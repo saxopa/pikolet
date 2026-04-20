@@ -65,7 +65,7 @@ export default function AddLogScreen() {
           numberOfLines={3}
           placeholder="Décris la séance, les observations…"
           className="border border-gray-200 rounded-xl px-4 py-3 text-sm mb-4"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A08878"
           style={{ minHeight: 80, textAlignVertical: "top" }}
         />
 
@@ -76,7 +76,7 @@ export default function AddLogScreen() {
           keyboardType="decimal-pad"
           placeholder="Ex: 12.5"
           className="border border-gray-200 rounded-xl px-4 py-3 text-sm mb-6"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A08878"
         />
 
         <TouchableOpacity onPress={handleSave} disabled={loading} className={`rounded-xl py-3.5 items-center ${loading ? "bg-accent/60" : "bg-accent"}`}>

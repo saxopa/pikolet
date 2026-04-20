@@ -14,7 +14,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Pikolèt utilise vos photos pour illustrer vos annonces et votre profil.",
+        "NSPhotoLibraryAddUsageDescription": "Pikolèt enregistre des photos dans votre galerie.",
+        "NSMicrophoneUsageDescription": "Pikolèt peut enregistrer des chants depuis votre microphone."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +27,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -30,14 +40,20 @@
       "favicon": "./assets/images/favicon.png",
       "name": "Pikolèt",
       "shortName": "Pikolèt",
-      "description": "Communauté éleveurs Guyane — pikolèt & lorti",
-      "themeColor": "#1D9E75",
-      "backgroundColor": "#ffffff",
+      "description": "La communauté des éleveurs de pikolèt & lorti en Guyane",
+      "themeColor": "#B85C38",
+      "backgroundColor": "#FAF6F0",
       "display": "standalone",
       "orientation": "portrait"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Pikolèt utilise vos photos pour illustrer vos annonces et votre profil."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

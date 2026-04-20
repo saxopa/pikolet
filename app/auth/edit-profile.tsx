@@ -90,7 +90,7 @@ export default function EditProfileScreen() {
               />
             ) : (
               <View style={{ width: 88, height: 88, borderRadius: 44 }} className="bg-gray-100 items-center justify-center">
-                <Ionicons name="person" size={36} color="#9CA3AF" />
+                <Ionicons name="person" size={36} color="#A08878" />
               </View>
             )}
             <View className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-accent items-center justify-center border-2 border-white">
@@ -111,7 +111,7 @@ export default function EditProfileScreen() {
               onChangeText={f.set}
               placeholder={f.placeholder}
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#A08878"
             />
           </View>
         ))}
@@ -125,7 +125,7 @@ export default function EditProfileScreen() {
             numberOfLines={3}
             placeholder="Éleveur depuis… Spécialité…"
             className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
             style={{ minHeight: 80, textAlignVertical: "top" }}
           />
         </View>

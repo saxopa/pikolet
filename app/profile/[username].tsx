@@ -242,7 +242,7 @@ export default function PublicProfileScreen() {
                   <Ionicons
                     name={tab.icon as any}
                     size={15}
-                    color={activeTab === tab.key ? "#1D9E75" : "#9CA3AF"}
+                    color={activeTab === tab.key ? "#B85C38" : "#9CA3AF"}
                   />
                   <Text className={`text-[13px] ${activeTab === tab.key ? "text-accent font-semibold" : "text-gray-400"}`}>
                     {tab.label}

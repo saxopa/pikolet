@@ -12,7 +12,7 @@ import { SkeletonPostCard } from "../../components/ui/SkeletonPostCard";
 
 export default function FeedScreen() {
   const { user } = useAuth();
-  const { posts, loading, refreshing, refresh, like, loadMore, loadingMore, hasMore } = useFeed(user?.id);
+  const { posts, loading, refreshing, refresh, like, loadMore, loadingMore, hasMore, error } = useFeed(user?.id);
   const router = useRouter();
   const [commentPostId, setCommentPostId] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -72,11 +72,21 @@ export default function FeedScreen() {
         </View>
       )}
 
-      {loading ? (
+      {error && (
+        <View className="flex-1 items-center justify-center gap-3">
+          <Text className="text-3xl">📡</Text>
+          <Text className="text-sm text-gray-500">Impossible de charger le feed</Text>
+          <TouchableOpacity onPress={refresh} className="px-5 py-2 bg-accent rounded-xl">
+            <Text className="text-white text-sm font-semibold">Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!error && loading ? (
         <View className="px-4 pt-2">
           {[1, 2, 3].map(i => <SkeletonPostCard key={i} />)}
         </View>
-      ) : (
+      ) : !error && (
         <FlatList
           data={filtered}
           keyExtractor={p => p.id}

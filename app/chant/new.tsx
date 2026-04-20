@@ -131,7 +131,7 @@ export default function NewSongScreen() {
       <ScrollView contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
         <View className="mb-4">
           <Text className="text-xs font-medium text-gray-600 mb-1.5">Titre *</Text>
-          <TextInput value={title} onChangeText={setTitle} placeholder="Ex: Chant des marais de Kaw" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />
+          <TextInput value={title} onChangeText={setTitle} placeholder="Ex: Chant des marais de Kaw" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#A08878" />
         </View>
 
         {birds.length > 0 && (
@@ -181,7 +181,7 @@ export default function NewSongScreen() {
                 <Ionicons
                   name={mode === "file" ? "musical-note" : "logo-youtube"}
                   size={16}
-                  color={sourceMode === mode ? "#0F6E56" : "#6B7280"}
+                  color={sourceMode === mode ? "#1E7A4F" : "#7A6456"}
                 />
                 <Text className={`text-sm font-medium ${sourceMode === mode ? "text-accent-dark" : "text-gray-500"}`}>
                   {mode === "file" ? "Fichier audio" : "YouTube"}
@@ -198,7 +198,7 @@ export default function NewSongScreen() {
               <Ionicons
                 name={audioFile ? "checkmark-circle" : "cloud-upload-outline"}
                 size={28}
-                color={audioFile ? "#1D9E75" : "#9CA3AF"}
+                color={audioFile ? "#1E7A4F" : "#A08878"}
               />
               <Text className={`text-sm font-medium ${audioFile ? "text-accent-dark" : "text-gray-400"}`}>
                 {audioFile ? audioFile.name : "Appuyer pour choisir un fichier"}
@@ -213,7 +213,7 @@ export default function NewSongScreen() {
               onChangeText={setYoutubeUrl}
               placeholder="https://youtube.com/watch?v=..."
               className="border border-gray-200 rounded-xl px-4 py-3 text-sm"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#A08878"
               autoCapitalize="none"
               keyboardType="url"
             />

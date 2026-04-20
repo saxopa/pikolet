@@ -24,7 +24,7 @@ type ListingWithSeller = Listing & {
 export default function MarcheScreen() {
   const { user } = useAuth();
   const router = useRouter();
-  const { listings, category, changeCategory, loading, refresh } = useListings();
+  const { listings, category, changeCategory, loading, error, refresh } = useListings();
   const [query, setQuery] = useState("");
   const isMounted = useRef(false);
 
@@ -90,11 +90,21 @@ export default function MarcheScreen() {
         />
       </View>
 
-      {loading ? (
+      {error && (
+        <View className="flex-1 items-center justify-center gap-3">
+          <Text className="text-3xl">📡</Text>
+          <Text className="text-sm text-gray-500">Impossible de charger les annonces</Text>
+          <TouchableOpacity onPress={refresh} className="px-5 py-2 bg-accent rounded-xl">
+            <Text className="text-white text-sm font-semibold">Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!error && loading ? (
         <View className="px-4 pt-2">
           {[1, 2, 3].map(i => <SkeletonPostCard key={i} />)}
         </View>
-      ) : (
+      ) : !error && (
         <FlatList
           data={filtered as ListingWithSeller[]}
           keyExtractor={l => l.id}

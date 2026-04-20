@@ -125,7 +125,7 @@ export default function NewPostScreen() {
           multiline
           placeholder="Partage une observation, une victoire, un chant…"
           className="text-sm text-gray-900 leading-6 mb-4"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A08878"
           style={{ minHeight: 100, textAlignVertical: "top" }}
           autoFocus
         />
@@ -159,7 +159,7 @@ export default function NewPostScreen() {
             onChangeText={setYoutubeUrl}
             placeholder="https://youtube.com/watch?v=…"
             className="text-xs text-gray-900 border border-gray-200 rounded-xl px-3 py-2 mb-3"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A08878"
             autoCapitalize="none"
             keyboardType="url"
           />

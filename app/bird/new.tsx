@@ -110,7 +110,7 @@ export default function NewBirdScreen() {
 
         <View className="mb-4">
           <Text className="text-xs font-medium text-gray-600 mb-1.5">Nom *</Text>
-          <TextInput value={name} onChangeText={setName} placeholder="Ex: Prodige" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />
+          <TextInput value={name} onChangeText={setName} placeholder="Ex: Prodige" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#A08878" />
         </View>
 
         <Picker label="Espèce *" value={species} onChange={setSpecies} options={[{ key: "pikolet", label: "🐤 Pikolèt" }, { key: "lorti", label: "🦜 Lorti" }]} />
@@ -122,12 +122,12 @@ export default function NewBirdScreen() {
 
         <View className="mb-4">
           <Text className="text-xs font-medium text-gray-600 mb-1.5">Bague (optionnel)</Text>
-          <TextInput value={ringCode} onChangeText={setRingCode} placeholder="GUY-2024-001" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />
+          <TextInput value={ringCode} onChangeText={setRingCode} placeholder="GUY-2024-001" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#A08878" />
         </View>
 
         <View className="mb-6">
           <Text className="text-xs font-medium text-gray-600 mb-1.5">Lignée (optionnel)</Text>
-          <TextInput value={lineage} onChangeText={setLineage} placeholder="Ex: Kaw × Suriname" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#9CA3AF" />
+          <TextInput value={lineage} onChangeText={setLineage} placeholder="Ex: Kaw × Suriname" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#A08878" />
         </View>
 
         <TouchableOpacity onPress={handleCreate} disabled={loading} className={`rounded-xl py-3.5 items-center ${loading ? "bg-accent/60" : "bg-accent"}`}>

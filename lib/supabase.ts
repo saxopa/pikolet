@@ -131,7 +131,7 @@ export const getPublicSongs = (species?: string) => {
     .eq("is_public", true)
     .order("play_count", { ascending: false });
   if (species) q = q.eq("bird.species", species);
-  return q;
+  return q.limit(50);
 };
 
 export const getMySongs = (ownerId: string) =>
