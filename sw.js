@@ -55,7 +55,16 @@ self.addEventListener('fetch', (event) => {
   // Ignorer les protocoles non-HTTP (chrome-extension:, etc.)
   if (!url.protocol.startsWith('http')) return;
 
-  // ── Jamais de cache Supabase (auth, API REST, Realtime WS, Storage) ──
+  // ── Supabase Storage audio (bird-songs) → Cache-first pour offline PWA ──
+  if (
+    (url.hostname.includes('supabase.co') || url.hostname.includes('supabase.io')) &&
+    url.pathname.includes('/storage/v1/object/public/bird-songs/')
+  ) {
+    event.respondWith(cacheFirst(request));
+    return;
+  }
+
+  // ── Jamais de cache Supabase (auth, API REST, Realtime WS, autres Storage) ──
   if (
     url.hostname.includes('supabase.co') ||
     url.hostname.includes('supabase.io')
