@@ -164,7 +164,8 @@ export const getProfilePosts = (userId: string) =>
     `)
     .eq("author_id", userId)
     .eq("visibility", "public")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
 
 export const getPublicBirds = (userId: string) =>
   supabase
@@ -185,8 +186,13 @@ export const isFollowing = (followerId: string, followingId: string) =>
 
 export const uploadBirdSong = async (ownerId: string, fileUri: string, fileName: string, mimeType: string) => {
   const path = `${ownerId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  let blob: Blob;
+  try {
+    const response = await fetch(fileUri);
+    blob = await response.blob();
+  } catch (e) {
+    return { url: null, error: e as Error };
+  }
   const { error } = await supabase.storage
     .from("bird-songs")
     .upload(path, blob, { contentType: mimeType || "audio/mpeg", upsert: false });
@@ -255,8 +261,13 @@ export const deleteCompetition = (compId: string) =>
 
 export const uploadPostImage = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
   const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  let blob: Blob;
+  try {
+    const response = await fetch(fileUri);
+    blob = await response.blob();
+  } catch (e) {
+    return { url: null, error: e as Error };
+  }
   const { error } = await supabase.storage
     .from("post-images")
     .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: false });
@@ -267,8 +278,13 @@ export const uploadPostImage = async (userId: string, fileUri: string, fileName:
 
 export const uploadPostAudio = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
   const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  let blob: Blob;
+  try {
+    const response = await fetch(fileUri);
+    blob = await response.blob();
+  } catch (e) {
+    return { url: null, error: e as Error };
+  }
   const { error } = await supabase.storage
     .from("post-audio")
     .upload(path, blob, { contentType: mimeType || "audio/mpeg", upsert: false });
@@ -281,8 +297,13 @@ export const uploadPostAudio = async (userId: string, fileUri: string, fileName:
 
 export const uploadAvatar = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
   const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  let blob: Blob;
+  try {
+    const response = await fetch(fileUri);
+    blob = await response.blob();
+  } catch (e) {
+    return { url: null, error: e as Error };
+  }
   const { error } = await supabase.storage
     .from("avatars")
     .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: true });
@@ -295,8 +316,13 @@ export const uploadAvatar = async (userId: string, fileUri: string, fileName: st
 
 export const uploadBirdImage = async (userId: string, fileUri: string, fileName: string, mimeType: string) => {
   const path = `${userId}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  let blob: Blob;
+  try {
+    const response = await fetch(fileUri);
+    blob = await response.blob();
+  } catch (e) {
+    return { url: null, error: e as Error };
+  }
   const { error } = await supabase.storage
     .from("bird-images")
     .upload(path, blob, { contentType: mimeType || "image/jpeg", upsert: false });

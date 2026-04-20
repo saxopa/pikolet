@@ -25,8 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data } = await getProfile(userId);
-    setProfile(data);
+    let data = null;
+    for (let i = 0; i < 3; i++) {
+      const result = await getProfile(userId);
+      if (result.data) { data = result.data; break; }
+      if (i < 2) await new Promise(r => setTimeout(r, 800));
+    }
+    setProfile(data as Profile | null);
     setLoading(false);
   }, []);
 
