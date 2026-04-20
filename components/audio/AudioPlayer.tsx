@@ -8,6 +8,7 @@ type Props = {
   youtubeUrl?: string | null;
   duration?: number | null;
   title?: string;
+  localUri?: string | null;
 };
 
 function formatDuration(s: number) {
@@ -16,7 +17,7 @@ function formatDuration(s: number) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
+export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Props) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,13 +37,15 @@ export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
       Linking.openURL(youtubeUrl);
       return;
     }
-    if (!url) return;
+    // Prefer local file over remote URL
+    const playUri = localUri ?? url;
+    if (!playUri) return;
 
     if (Platform.OS === "web") {
       // HTML5 Audio pour les fichiers storage sur web/PWA
       if (!sound.current) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const audio = new (window as any).Audio(url) as HTMLAudioElement;
+        const audio = new (window as any).Audio(playUri) as HTMLAudioElement;
         audio.addEventListener("ended", () => { setPlaying(false); setProgress(0); });
         audio.addEventListener("timeupdate", () => {
           if (audio.duration) setProgress(audio.currentTime / audio.duration);
@@ -62,7 +65,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
     // Native : expo-av
     if (!sound.current) {
       const { Audio } = await import("expo-av");
-      const { sound: s } = await Audio.Sound.createAsync({ uri: url }, {}, (status) => {
+      const { sound: s } = await Audio.Sound.createAsync({ uri: playUri }, {}, (status) => {
         if (status.isLoaded && status.durationMillis) {
           setProgress(status.positionMillis / status.durationMillis);
           if (status.didJustFinish) { setPlaying(false); setProgress(0); }
@@ -75,7 +78,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title }: Props) {
   }
 
   const isYt = !!youtubeUrl;
-  const hasAudio = isYt || !!url;
+  const hasAudio = isYt || !!url || !!localUri;
 
   if (!hasAudio) return null;
 
