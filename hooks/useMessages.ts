@@ -81,5 +81,5 @@ export function useMessages(conversationId: string, userId?: string) {
     return true;
   }, [conversationId, userId]);
 
-  return { messages, loading, sending, send };
+  return { messages, loading, sending, send, refresh: load };
 }

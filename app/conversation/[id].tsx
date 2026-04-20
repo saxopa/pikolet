@@ -1,6 +1,6 @@
 import {
   View, Text, FlatList, TextInput, TouchableOpacity,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, RefreshControl,
 } from "react-native";
 import { useRef, useState, useEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -47,7 +47,8 @@ export default function ConversationScreen() {
   const { id, username, display } = useLocalSearchParams<{ id: string; username: string; display: string }>();
   const { user } = useAuth();
   const navigation = useNavigation();
-  const { messages, loading, sending, send } = useMessages(id, user?.id);
+  const { messages, loading, sending, send, refresh } = useMessages(id, user?.id);
+  const [refreshing, setRefreshing] = useState(false);
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
 
@@ -60,6 +61,12 @@ export default function ConversationScreen() {
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
     }
   }, [messages.length]);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
+  }
 
   async function handleSend() {
     const content = input.trim();
@@ -127,6 +134,9 @@ export default function ConversationScreen() {
           renderItem={renderItem}
           contentContainerStyle={{ paddingVertical: 12, paddingBottom: 8 }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#B85C38" />
+          }
           ListEmptyComponent={
             <View className="flex-1 items-center justify-center pt-20">
               <Text className="text-3xl mb-2">👋</Text>

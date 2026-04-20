@@ -30,6 +30,20 @@ jobs:
       - name: Build PWA statique
         run: npx expo export --platform web
 
+      - name: Copier le service worker à la racine du dist
+        run: cp public/sw.js dist/sw.js
+
+      - name: Appliquer le manifest PWA complet
+        run: |
+          node -e "
+          const fs = require('fs');
+          const src = 'public/manifest.json';
+          const dest = 'dist/manifest.json';
+          // Toujours utiliser notre manifest complet
+          fs.copyFileSync(src, dest);
+          console.log('manifest.json copié depuis public/');
+          "
+
       - name: Créer 404.html pour SPA routing
         run: |
           cat > dist/404.html << 'EOF'
