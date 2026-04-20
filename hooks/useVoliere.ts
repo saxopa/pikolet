@@ -4,10 +4,10 @@ import type { Bird, BirdLog, BirdSong, Competition } from "../types";
 
 export function useVoliere(ownerId?: string) {
   const [birds, setBirds] = useState<Bird[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!ownerId) return;
+    if (!ownerId) { setLoading(false); return; }
     setLoading(true);
     const { data } = await getMyBirds(ownerId);
     if (data) setBirds(data as unknown as Bird[]);

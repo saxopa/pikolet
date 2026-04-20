@@ -9,8 +9,32 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { SkeletonBirdCard } from "../../components/ui/SkeletonBirdCard";
 
 export default function VoliereScreen() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { birds, loading, refresh } = useVoliere(user?.id);
+
+  if (!isAuthenticated) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50 px-8">
+        <Text className="text-5xl mb-4">🪺</Text>
+        <Text className="text-lg font-bold text-gray-900 mb-2 font-display">Ta volière t'attend</Text>
+        <Text className="text-sm text-gray-500 text-center mb-8">
+          Connecte-toi pour gérer tes oiseaux, suivre leurs performances et enregistrer leurs chants
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.push("/auth/login")}
+          className="bg-accent rounded-xl px-8 py-3.5 w-full items-center mb-3"
+        >
+          <Text className="text-white font-semibold">Connexion</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/auth/register")}
+          className="border border-accent rounded-xl px-8 py-3.5 w-full items-center"
+        >
+          <Text className="text-accent font-semibold">Créer un compte</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
   const router = useRouter();
   const [query, setQuery] = useState("");
   const isMounted = useRef(false);

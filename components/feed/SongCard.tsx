@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer } from "../audio/AudioPlayer";
 import type { SongWithMeta } from "../../hooks/useChants";
@@ -16,6 +17,8 @@ type Props = {
 };
 
 export function SongCard({ song, onDelete }: Props) {
+  const router = useRouter();
+
   function confirmDelete() {
     if (Platform.OS === "web") {
       if ((window as any).confirm("Supprimer ce chant ? Cette action est irréversible.")) {
@@ -50,7 +53,9 @@ export function SongCard({ song, onDelete }: Props) {
             {song.bird?.species === "pikolet" ? "Pikolèt" : "Lorti"} · {song.bird?.name}
           </Text>
           {song.owner?.username && (
-            <Text className="text-[11px] text-forest mt-0.5">Partagé par {song.owner.username}</Text>
+            <TouchableOpacity onPress={() => router.push(`/profile/${song.owner.username}`)}>
+              <Text className="text-[11px] text-forest mt-0.5">Partagé par {song.owner.username}</Text>
+            </TouchableOpacity>
           )}
         </View>
         <View className="flex-row items-center gap-2">
