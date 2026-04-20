@@ -1,12 +1,18 @@
 import {
-  View, Text, TextInput, TouchableOpacity, Alert,
-  KeyboardAvoidingView, Platform, ScrollView,
+  View, Text, TextInput, TouchableOpacity,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Modal,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { signUpWithEmail } from "../../lib/supabase";
+import { useToast } from "../../context/ToastContext";
 
-type Field = { label: string; value: string; set: (v: string) => void; placeholder: string; secure?: boolean; keyboard?: "default" | "email-address" };
+type FieldErrors = {
+  username?: string;
+  email?: string;
+  password?: string;
+};
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
@@ -14,33 +20,33 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
-  const fields: Field[] = [
-    { label: "Pseudo *", value: username, set: setUsername, placeholder: "Djef_Az" },
-    { label: "Email *", value: email, set: setEmail, placeholder: "ton@email.com", keyboard: "email-address" },
-    { label: "Mot de passe *", value: password, set: setPassword, placeholder: "6 caractères min.", secure: true },
-    { label: "Ville (optionnel)", value: location, set: setLocation, placeholder: "Cayenne" },
-  ];
+  function clearError(field: keyof FieldErrors) {
+    setErrors(e => { const next = { ...e }; delete next[field]; return next; });
+  }
 
   async function handleRegister() {
-    if (!email.trim() || !password || !username.trim()) {
-      Alert.alert("Champs requis", "Email, mot de passe et pseudo sont obligatoires.");
-      return;
-    }
-    if (username.trim().length < 3) {
-      Alert.alert("Pseudo trop court", "3 caractères minimum.");
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert("Mot de passe trop court", "6 caractères minimum.");
-      return;
-    }
-    if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
-      Alert.alert("Pseudo invalide", "Lettres, chiffres et _ uniquement.");
+    const newErrors: FieldErrors = {};
+    if (!username.trim()) newErrors.username = "Le pseudo est obligatoire.";
+    else if (username.trim().length < 3) newErrors.username = "3 caractères minimum.";
+    else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) newErrors.username = "Lettres, chiffres et _ uniquement.";
+
+    if (!email.trim()) newErrors.email = "L'email est obligatoire.";
+
+    if (!password) newErrors.password = "Le mot de passe est obligatoire.";
+    else if (password.length < 6) newErrors.password = "6 caractères minimum.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
+    setErrors({});
     setLoading(true);
     const { error } = await signUpWithEmail(email.trim().toLowerCase(), password, {
       username: username.trim(),
@@ -49,26 +55,77 @@ export default function RegisterScreen() {
     setLoading(false);
 
     if (error) {
-      let msg = "Une erreur est survenue, réessaie plus tard.";
-      if (error.message.includes("already registered") || error.message.includes("User already registered")) {
-        msg = "Cet email est déjà utilisé.";
-      } else if (error.message.includes("rate limit") || error.message.includes("only request this after") || error.status === 429) {
-        msg = "Trop de tentatives. Attends une minute avant de réessayer.";
-      } else if (error.message.includes("invalid email") || error.message.includes("Invalid email")) {
-        msg = "L'adresse email n'est pas valide.";
+      if (
+        error.message.includes("already registered") ||
+        error.message.includes("User already registered")
+      ) {
+        setErrors({ email: "Cet email est déjà utilisé." });
+        toast("Cet email est déjà utilisé.", "error");
+      } else if (
+        error.message.toLowerCase().includes("rate limit") ||
+        error.message.includes("only request this after") ||
+        (error as any).status === 429
+      ) {
+        toast("Trop de tentatives. Attends quelques minutes.", "error");
+      } else if (
+        error.message.includes("invalid email") ||
+        error.message.includes("Invalid email")
+      ) {
+        setErrors({ email: "Adresse email invalide." });
+        toast("Adresse email invalide.", "error");
       } else if (error.message.includes("Password should be")) {
-        msg = "Le mot de passe est trop faible. Utilise au moins 6 caractères.";
-      } else if (error.message.includes("duplicate") || error.message.includes("unique")) {
-        msg = "Ce pseudo est déjà pris, choisis-en un autre.";
+        setErrors({ password: "Mot de passe trop faible." });
+        toast("Mot de passe trop faible.", "error");
+      } else if (
+        error.message.includes("duplicate") ||
+        error.message.includes("unique")
+      ) {
+        setErrors({ username: "Ce pseudo est déjà pris." });
+        toast("Ce pseudo est déjà pris.", "error");
+      } else {
+        toast(`Erreur : ${error.message}`, "error");
       }
-      Alert.alert("Erreur inscription", msg);
       return;
     }
 
-    Alert.alert(
-      "Compte créé ! 🐦",
-      "Un email de confirmation t'a été envoyé.\n\n1. Ouvre ton email\n2. Clique sur le lien de confirmation\n3. Reviens ici et connecte-toi",
-      [{ text: "Se connecter", onPress: () => router.replace("/auth/login") }]
+    setSuccess(true);
+  }
+
+  if (success) {
+    return (
+      <View className="flex-1 items-center justify-center bg-accent-light px-8">
+        <Text style={{ fontSize: 64, marginBottom: 16 }}>📬</Text>
+        <Text className="text-[22px] font-bold text-accent-dark font-display text-center mb-3">
+          Vérifie tes emails !
+        </Text>
+        <Text className="text-sm text-accent text-center mb-2 leading-6">
+          Un email de confirmation t'a été envoyé.
+        </Text>
+        <Text className="text-sm text-accent/80 text-center mb-8 leading-6">
+          Clique sur le lien dans l'email → tu seras connecté automatiquement.
+        </Text>
+        <View className="w-full bg-white rounded-2xl px-5 py-4 mb-8 gap-3">
+          {([
+            { n: "1", t: "Ouvre l'application Mail" },
+            { n: "2", t: "Clique sur le lien de confirmation" },
+            { n: "3", t: "Tu es connecté automatiquement !" },
+          ] as const).map(({ n, t }) => (
+            <View key={n} className="flex-row items-center gap-3">
+              <View className="w-7 h-7 rounded-full bg-accent items-center justify-center">
+                <Text className="text-white text-xs font-bold">{n}</Text>
+              </View>
+              <Text className="text-sm text-gray-700 flex-1">{t}</Text>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity
+          onPress={() => router.replace("/auth/login")}
+          className="bg-accent rounded-xl px-8 py-3.5 w-full items-center"
+          accessibilityRole="button"
+        >
+          <Text className="text-white font-bold">Aller à la connexion</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -77,14 +134,40 @@ export default function RegisterScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-accent-light"
     >
-      {/* Compact warm header */}
+      {/* Overlay de chargement */}
+      <Modal visible={loading} transparent animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 32,
+              alignItems: "center",
+              gap: 16,
+              minWidth: 180,
+            }}
+          >
+            <ActivityIndicator size="large" color="#B85C38" />
+            <Text style={{ color: "#7A4E2D", fontWeight: "600", fontSize: 15 }}>
+              Création du compte…
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
       <View className="items-center px-8 pt-12 pb-6">
         <Text style={{ fontSize: 40, marginBottom: 8 }}>🐤</Text>
         <Text className="text-[22px] font-bold text-accent-dark font-display">Pikolèt</Text>
         <Text className="text-sm text-accent mt-1">Rejoins la communauté</Text>
       </View>
 
-      {/* White form card with scroll */}
       <View
         className="flex-1 bg-white"
         style={{ borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
@@ -95,36 +178,125 @@ export default function RegisterScreen() {
         >
           <Text className="text-xl font-bold text-gray-900 mb-5 font-display">Créer un compte</Text>
 
-          {fields.map((f) => (
-            <View key={f.label} className="mb-4">
-              <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{f.label}</Text>
+          {/* Pseudo */}
+          <View className="mb-4">
+            <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+              Pseudo <Text className="text-red-400">*</Text>
+            </Text>
+            <TextInput
+              value={username}
+              onChangeText={(v) => { setUsername(v); clearError("username"); }}
+              autoCapitalize="none"
+              placeholder="Djef_Az"
+              returnKeyType="next"
+              className={`border rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 ${errors.username ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+              placeholderTextColor="#A08878"
+              accessibilityLabel="Pseudo"
+              textContentType="username"
+            />
+            {errors.username ? (
+              <View className="flex-row items-center gap-1 mt-1.5">
+                <Ionicons name="alert-circle" size={13} color="#b91c1c" />
+                <Text className="text-xs text-red-600">{errors.username}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Email */}
+          <View className="mb-4">
+            <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+              Email <Text className="text-red-400">*</Text>
+            </Text>
+            <TextInput
+              value={email}
+              onChangeText={(v) => { setEmail(v); clearError("email"); }}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="ton@email.com"
+              returnKeyType="next"
+              className={`border rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 ${errors.email ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+              placeholderTextColor="#A08878"
+              accessibilityLabel="Adresse email"
+              textContentType="emailAddress"
+              autoComplete="email"
+            />
+            {errors.email ? (
+              <View className="flex-row items-center gap-1 mt-1.5">
+                <Ionicons name="alert-circle" size={13} color="#b91c1c" />
+                <Text className="text-xs text-red-600">{errors.email}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Mot de passe */}
+          <View className="mb-4">
+            <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+              Mot de passe <Text className="text-red-400">*</Text>
+            </Text>
+            <View style={{ position: "relative" }}>
               <TextInput
-                value={f.value}
-                onChangeText={f.set}
-                autoCapitalize="none"
-                keyboardType={f.keyboard ?? "default"}
-                secureTextEntry={f.secure}
-                placeholder={f.placeholder}
-                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50"
+                value={password}
+                onChangeText={(v) => { setPassword(v); clearError("password"); }}
+                secureTextEntry={!showPassword}
+                placeholder="6 caractères min."
+                returnKeyType="next"
+                className={`border rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 ${errors.password ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+                style={{ paddingRight: 48 }}
                 placeholderTextColor="#A08878"
+                accessibilityLabel="Mot de passe"
+                textContentType="newPassword"
               />
+              <TouchableOpacity
+                onPress={() => setShowPassword(s => !s)}
+                style={{ position: "absolute", right: 12, top: 12 }}
+                accessibilityLabel={showPassword ? "Masquer" : "Afficher"}
+                accessibilityRole="button"
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#A08878"
+                />
+              </TouchableOpacity>
             </View>
-          ))}
+            {errors.password ? (
+              <View className="flex-row items-center gap-1 mt-1.5">
+                <Ionicons name="alert-circle" size={13} color="#b91c1c" />
+                <Text className="text-xs text-red-600">{errors.password}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Ville */}
+          <View className="mb-5">
+            <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Ville (optionnel)</Text>
+            <TextInput
+              value={location}
+              onChangeText={setLocation}
+              placeholder="Cayenne"
+              returnKeyType="done"
+              onSubmitEditing={handleRegister}
+              className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50"
+              placeholderTextColor="#A08878"
+              accessibilityLabel="Ville"
+              textContentType="addressCity"
+            />
+          </View>
 
           <TouchableOpacity
             onPress={handleRegister}
             disabled={loading}
-            className={`rounded-xl py-3.5 items-center mt-2 mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
+            className="rounded-xl py-3.5 items-center mt-2 mb-4 bg-accent"
             activeOpacity={0.85}
+            accessibilityRole="button"
           >
-            <Text className="text-white font-bold text-base">
-              {loading ? "Création du compte…" : "Créer mon compte"}
-            </Text>
+            <Text className="text-white font-bold text-base">Créer mon compte</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => router.replace("/auth/login")}
             className="items-center py-2"
+            accessibilityRole="button"
           >
             <Text className="text-sm text-gray-400">
               Déjà un compte ?{" "}

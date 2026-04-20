@@ -10,6 +10,41 @@ import { CommentsSheet } from "../../components/feed/CommentsSheet";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { SkeletonPostCard } from "../../components/ui/SkeletonPostCard";
 
+function GuestBanner({ onLogin, onRegister }: { onLogin: () => void; onRegister: () => void }) {
+  return (
+    <View
+      className="mx-4 mb-3 bg-accent-light border border-accent/20 rounded-2xl px-4 py-3"
+      accessibilityRole="banner"
+    >
+      <View className="flex-row items-center gap-2 mb-2">
+        <Ionicons name="lock-closed-outline" size={15} color="#B85C38" />
+        <Text className="text-sm font-semibold text-accent-dark">Rejoins la communauté</Text>
+      </View>
+      <Text className="text-xs text-accent/80 mb-3 leading-5">
+        Connecte-toi pour liker, commenter, publier tes chants et accéder à ta volière.
+      </Text>
+      <View className="flex-row gap-2">
+        <TouchableOpacity
+          onPress={onLogin}
+          className="flex-1 bg-accent rounded-xl py-2 items-center"
+          accessibilityRole="button"
+          accessibilityLabel="Se connecter"
+        >
+          <Text className="text-white text-xs font-bold">Connexion</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onRegister}
+          className="flex-1 border border-accent rounded-xl py-2 items-center"
+          accessibilityRole="button"
+          accessibilityLabel="Créer un compte gratuitement"
+        >
+          <Text className="text-accent text-xs font-semibold">Créer un compte</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 export default function FeedScreen() {
   const { user } = useAuth();
   const { posts, loading, refreshing, refresh, like, loadMore, loadingMore, hasMore, error } = useFeed(user?.id);
@@ -68,8 +103,16 @@ export default function FeedScreen() {
             autoFocus
             className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
             placeholderTextColor="#A08878"
+            accessibilityLabel="Rechercher dans le feed"
           />
         </View>
+      )}
+
+      {!user && (
+        <GuestBanner
+          onLogin={() => router.push("/auth/login")}
+          onRegister={() => router.push("/auth/register")}
+        />
       )}
 
       {error && (

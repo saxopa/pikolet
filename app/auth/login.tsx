@@ -1,10 +1,12 @@
 import {
-  View, Text, TextInput, TouchableOpacity, Alert,
-  KeyboardAvoidingView, Platform,
+  View, Text, TextInput, TouchableOpacity,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Modal,
 } from "react-native";
 import { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { signInWithEmail } from "../../lib/supabase";
+import { useToast } from "../../context/ToastContext";
 
 const ERROR_MAP: Record<string, string> = {
   "Invalid login credentials": "Email ou mot de passe incorrect.",
@@ -16,23 +18,23 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
   const params = useLocalSearchParams<{ confirm_error?: string }>();
-
-  // Message renvoyé par auth/confirm si le lien était expiré
   const confirmError = params.confirm_error;
 
   async function handleLogin() {
     if (!email.trim() || !password) {
-      Alert.alert("Champs requis", "Remplis l'email et le mot de passe.");
+      toast("Remplis l'email et le mot de passe.", "error");
       return;
     }
     setLoading(true);
     const { error } = await signInWithEmail(email.trim().toLowerCase(), password);
     setLoading(false);
     if (error) {
-      const msg = ERROR_MAP[error.message] ?? error.message;
-      Alert.alert("Connexion impossible", msg);
+      const msg = ERROR_MAP[error.message] ?? "Connexion impossible. Vérifie tes identifiants.";
+      toast(msg, "error");
       return;
     }
     router.replace("/(tabs)/feed");
@@ -43,72 +45,130 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-accent-light"
     >
-      {/* Warm header */}
-      <View className="items-center px-8 pt-16 pb-10">
-        <Text style={{ fontSize: 52, marginBottom: 10 }}>🐤</Text>
-        <Text className="text-[30px] font-bold text-accent-dark font-display">Pikolèt</Text>
-        <Text className="text-sm text-accent mt-2 font-medium">Communauté éleveurs</Text>
-      </View>
-
-      {/* Bandeau d'erreur si le lien de confirmation était expiré */}
-      {confirmError ? (
-        <View className="mx-6 mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
-          <Text className="text-sm text-red-700 text-center">{confirmError}</Text>
+      {/* Overlay de chargement */}
+      <Modal visible={loading} transparent animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 32,
+              alignItems: "center",
+              gap: 16,
+              minWidth: 180,
+            }}
+          >
+            <ActivityIndicator size="large" color="#B85C38" />
+            <Text style={{ color: "#7A4E2D", fontWeight: "600", fontSize: 15 }}>
+              Connexion…
+            </Text>
+          </View>
         </View>
-      ) : null}
+      </Modal>
 
-      {/* White form card */}
-      <View
-        className="flex-1 bg-white px-6 pt-8"
-        style={{ borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text className="text-xl font-bold text-gray-900 mb-6 font-display">Connexion</Text>
+        {/* Header */}
+        <View className="items-center px-8 pt-16 pb-10">
+          <Text style={{ fontSize: 52, marginBottom: 10 }}>🐤</Text>
+          <Text className="text-[30px] font-bold text-accent-dark font-display">Pikolèt</Text>
+          <Text className="text-sm text-accent mt-2 font-medium">Communauté éleveurs</Text>
+        </View>
 
-        <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          placeholder="ton@email.com"
-          returnKeyType="next"
-          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-4"
-          placeholderTextColor="#A08878"
-        />
+        {/* Bandeau erreur lien expiré */}
+        {confirmError ? (
+          <View
+            className="mx-6 mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl flex-row items-center gap-2"
+            accessibilityRole="alert"
+          >
+            <Ionicons name="warning-outline" size={16} color="#b91c1c" />
+            <Text className="text-sm text-red-700 flex-1">{confirmError}</Text>
+          </View>
+        ) : null}
 
-        <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Mot de passe</Text>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholder="••••••••"
-          returnKeyType="done"
-          onSubmitEditing={handleLogin}
-          className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-6"
-          placeholderTextColor="#A08878"
-        />
-
-        <TouchableOpacity
-          onPress={handleLogin}
-          disabled={loading}
-          className={`rounded-xl py-3.5 items-center mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
-          activeOpacity={0.85}
+        {/* Formulaire */}
+        <View
+          className="flex-1 bg-white px-6 pt-8"
+          style={{ borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
         >
-          <Text className="text-white font-bold text-base">
-            {loading ? "Connexion…" : "Se connecter"}
-          </Text>
-        </TouchableOpacity>
+          <Text className="text-xl font-bold text-gray-900 mb-6 font-display">Connexion</Text>
 
-        <TouchableOpacity
-          onPress={() => router.replace("/auth/register")}
-          className="items-center py-2"
-        >
-          <Text className="text-sm text-gray-400">
-            Pas encore de compte ?{" "}
-            <Text className="text-accent font-bold">Créer un compte</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Email</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholder="ton@email.com"
+            returnKeyType="next"
+            className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-4"
+            placeholderTextColor="#A08878"
+            accessibilityLabel="Adresse email"
+            textContentType="emailAddress"
+            autoComplete="email"
+          />
+
+          <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Mot de passe</Text>
+          <View style={{ position: "relative", marginBottom: 24 }}>
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              placeholder="••••••••"
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
+              className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50"
+              style={{ paddingRight: 48 }}
+              placeholderTextColor="#A08878"
+              accessibilityLabel="Mot de passe"
+              textContentType="password"
+              autoComplete="password"
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(s => !s)}
+              style={{ position: "absolute", right: 12, top: 12 }}
+              accessibilityLabel={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              accessibilityRole="button"
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={20}
+                color="#A08878"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={loading}
+            className="rounded-xl py-3.5 items-center mb-4 bg-accent"
+            activeOpacity={0.85}
+            accessibilityRole="button"
+          >
+            <Text className="text-white font-bold text-base">Se connecter</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.replace("/auth/register")}
+            className="items-center py-2"
+            accessibilityRole="button"
+          >
+            <Text className="text-sm text-gray-400">
+              Pas encore de compte ?{" "}
+              <Text className="text-accent font-bold">Créer un compte</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
