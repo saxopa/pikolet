@@ -5,7 +5,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { signUpWithEmail } from "../../lib/supabase";
+import { signUpWithEmail, signInWithGoogle } from "../../lib/supabase";
 import { useToast } from "../../context/ToastContext";
 
 type FieldErrors = {
@@ -28,6 +28,11 @@ export default function RegisterScreen() {
 
   function clearError(field: keyof FieldErrors) {
     setErrors(e => { const next = { ...e }; delete next[field]; return next; });
+  }
+
+  async function handleGoogle() {
+    const { error } = await signInWithGoogle();
+    if (error) toast("Connexion Google impossible.", "error");
   }
 
   async function handleRegister() {
@@ -291,6 +296,25 @@ export default function RegisterScreen() {
             accessibilityRole="button"
           >
             <Text className="text-white font-bold text-base">Créer mon compte</Text>
+          </TouchableOpacity>
+
+          {/* Séparateur */}
+          <View className="flex-row items-center gap-3 mb-4">
+            <View className="flex-1 h-px bg-gray-200" />
+            <Text className="text-xs text-gray-400">ou</Text>
+            <View className="flex-1 h-px bg-gray-200" />
+          </View>
+
+          {/* Google */}
+          <TouchableOpacity
+            onPress={handleGoogle}
+            className="flex-row items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 mb-4 bg-white"
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Continuer avec Google"
+          >
+            <Ionicons name="logo-google" size={18} color="#EA4335" />
+            <Text className="text-sm font-semibold text-gray-700">Continuer avec Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

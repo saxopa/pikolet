@@ -33,6 +33,12 @@ export const signUpWithEmail = (
     },
   });
 
+export const signInWithGoogle = () =>
+  supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: "https://saxopa.github.io/pikolet" },
+  });
+
 export const signOut = () => supabase.auth.signOut();
 
 export const getSession = () => supabase.auth.getSession();
