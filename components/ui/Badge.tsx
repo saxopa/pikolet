@@ -1,18 +1,20 @@
 import { View, Text } from "react-native";
 
-type Variant = "green" | "amber" | "blue" | "gray";
+type Variant = "green" | "amber" | "blue" | "gray" | "gold";
 
 const styles: Record<Variant, string> = {
-  green: "bg-accent-light",
-  amber:  "bg-amber-50",
-  blue:   "bg-blue-50",
-  gray:   "bg-gray-100",
+  green: "bg-forest-light",
+  amber: "bg-amber-50",
+  blue:  "bg-blue-50",
+  gray:  "bg-gray-100",
+  gold:  "bg-gold-light",
 };
 const textStyles: Record<Variant, string> = {
-  green: "text-accent-dark",
-  amber:  "text-amber-700",
-  blue:   "text-blue-700",
-  gray:   "text-gray-500",
+  green: "text-forest-dark",
+  amber: "text-amber-700",
+  blue:  "text-blue-700",
+  gray:  "text-gray-500",
+  gold:  "text-gold-dark",
 };
 
 type Props = { label: string; variant?: Variant };

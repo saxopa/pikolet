@@ -35,18 +35,18 @@ export default function FeedScreen() {
   }, [posts, query]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-50">
       <View className="px-5 pt-4 pb-2 flex-row items-end justify-between">
         <View>
-          <Text className="text-[22px] font-medium text-gray-900">Pikolèt</Text>
-          <Text className="text-[13px] text-gray-400">Communauté Guyane</Text>
+          <Text className="text-[24px] font-bold text-gray-900 font-display">Pikolèt</Text>
+          <Text className="text-[13px] text-gray-400">Communauté</Text>
         </View>
         <View className="flex-row gap-2">
           <TouchableOpacity
             onPress={() => { setShowSearch(s => !s); setQuery(""); }}
             className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center"
           >
-            <Ionicons name={showSearch ? "close" : "search"} size={16} color="#6B7280" />
+            <Ionicons name={showSearch ? "close" : "search"} size={16} color="#7A6456" />
           </TouchableOpacity>
           {user && (
             <TouchableOpacity
@@ -66,8 +66,8 @@ export default function FeedScreen() {
             onChangeText={setQuery}
             placeholder="Rechercher…"
             autoFocus
-            className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
-            placeholderTextColor="#9CA3AF"
+            className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+            placeholderTextColor="#A08878"
           />
         </View>
       )}
@@ -81,7 +81,7 @@ export default function FeedScreen() {
           data={filtered}
           keyExtractor={p => p.id}
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#1D9E75" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#B85C38" />}
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
           ListEmptyComponent={
@@ -94,7 +94,7 @@ export default function FeedScreen() {
           ListFooterComponent={
             loadingMore && hasMore ? (
               <View className="py-4 items-center">
-                <ActivityIndicator color="#1D9E75" />
+                <ActivityIndicator color="#B85C38" />
               </View>
             ) : null
           }

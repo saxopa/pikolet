@@ -11,8 +11,8 @@ export function Avatar({ uri, name, size = 36 }: Props) {
   }
 
   return (
-    <View style={style} className="bg-accent-light items-center justify-center">
-      <Text className="text-accent-dark font-semibold" style={{ fontSize: size * 0.35 }}>
+    <View style={style} className="bg-forest-light items-center justify-center">
+      <Text className="text-forest-dark font-semibold" style={{ fontSize: size * 0.35 }}>
         {initials}
       </Text>
     </View>

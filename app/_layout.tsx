@@ -15,7 +15,7 @@ SplashScreen.preventAutoHideAsync();
 
 function NavigationStack() {
   return (
-    <Stack screenOptions={{ headerTintColor: "#1D9E75", headerShadowVisible: false }}>
+    <Stack screenOptions={{ headerTintColor: "#B85C38", headerShadowVisible: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="auth/login" options={{ title: "Connexion", headerBackTitle: "" }} />
       <Stack.Screen name="auth/register" options={{ title: "Créer un compte", headerBackTitle: "" }} />

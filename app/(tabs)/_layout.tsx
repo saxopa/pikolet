@@ -4,24 +4,31 @@ import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
-function TabIcon({ name, color }: { name: IconName; color: string }) {
-  return <Ionicons size={24} name={name} color={color} />;
+function TabIcon({
+  name, activeIcon, color, focused,
+}: { name: IconName; activeIcon: IconName; color: string; focused: boolean }) {
+  return <Ionicons size={24} name={focused ? activeIcon : name} color={color} />;
 }
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#1D9E75",
-        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarActiveTintColor: "#B85C38",
+        tabBarInactiveTintColor: "#A08878",
         tabBarStyle: {
-          backgroundColor: "#ffffff",
-          borderTopWidth: 0.5,
-          borderTopColor: "#E5E7EB",
+          backgroundColor: "#FFFFFF",
+          borderTopWidth: 0,
           height: 80,
           paddingBottom: 16,
+          paddingTop: 8,
+          shadowColor: "#1C1209",
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.08,
+          shadowRadius: 16,
+          elevation: 12,
         },
-        tabBarLabelStyle: { fontSize: 10 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "500" },
         headerShown: useClientOnlyValue(false, true),
       }}
     >
@@ -29,28 +36,36 @@ export default function TabLayout() {
         name="feed"
         options={{
           title: "Feed",
-          tabBarIcon: ({ color }) => <TabIcon name="home-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="home-outline" activeIcon="home" color={color} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
         name="voliere"
         options={{
           title: "Volière",
-          tabBarIcon: ({ color }) => <TabIcon name="leaf-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="leaf-outline" activeIcon="leaf" color={color} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
         name="chants"
         options={{
           title: "Chants",
-          tabBarIcon: ({ color }) => <TabIcon name="musical-notes-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="musical-notes-outline" activeIcon="musical-notes" color={color} focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profil"
         options={{
           title: "Profil",
-          tabBarIcon: ({ color }) => <TabIcon name="person-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="person-outline" activeIcon="person" color={color} focused={focused} />
+          ),
         }}
       />
     </Tabs>

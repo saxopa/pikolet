@@ -110,11 +110,11 @@ export default function ProfilScreen() {
 
   if (!isAuthenticated) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-8">
+      <View className="flex-1 items-center justify-center bg-gray-50 px-8">
         <Text className="text-5xl mb-4">🐦</Text>
-        <Text className="text-lg font-semibold text-gray-900 mb-2">Rejoins la communauté</Text>
+        <Text className="text-lg font-semibold text-gray-900 mb-2 font-display">Rejoins la communauté</Text>
         <Text className="text-sm text-gray-500 text-center mb-8">
-          Connecte-toi pour suivre tes oiseaux, partager tes chants et rejoindre les éleveurs de Guyane
+          Connecte-toi pour suivre tes oiseaux, partager tes chants et rejoindre les éleveurs
         </Text>
         <TouchableOpacity
           onPress={() => router.push("/auth/login")}
@@ -188,11 +188,11 @@ export default function ProfilScreen() {
 
   return (
     <>
-      <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Header */}
-        <View className="items-center px-5 pt-8 pb-4">
+        <View className="items-center px-5 pt-8 pb-4 bg-white">
           <Avatar uri={profile?.avatar_url} name={profile?.display_name ?? profile?.username} size={80} />
-          <Text className="text-lg font-semibold text-gray-900 mt-3">
+          <Text className="text-lg font-bold text-gray-900 mt-3 font-display">
             {profile?.display_name ?? profile?.username ?? "Mon profil"}
           </Text>
           {profile?.username && (
@@ -206,16 +206,16 @@ export default function ProfilScreen() {
           )}
           <TouchableOpacity
             onPress={() => router.push("/auth/edit-profile")}
-            className="mt-4 flex-row items-center gap-1.5 px-6 py-2.5 rounded-full border border-gray-300 bg-white"
+            className="mt-4 flex-row items-center gap-1.5 px-6 py-2.5 rounded-full border border-gray-200 bg-gray-50"
             activeOpacity={0.8}
           >
-            <Ionicons name="pencil-outline" size={14} color="#6B7280" />
+            <Ionicons name="pencil-outline" size={14} color="#7A6456" />
             <Text className="text-sm font-semibold text-gray-600">Modifier</Text>
           </TouchableOpacity>
         </View>
 
         {/* Stats */}
-        <View className="flex-row border-t border-b border-gray-100">
+        <View className="flex-row bg-white border-t border-b border-gray-100 mt-px">
           {[
             { v: stats?.bird_count ?? "—", l: "oiseaux" },
             { v: stats?.song_count ?? "—", l: "chants" },
@@ -223,7 +223,7 @@ export default function ProfilScreen() {
             { v: stats?.win_count ?? "—", l: "victoires" },
           ].map(({ v, l }, i, arr) => (
             <View key={l} className={`flex-1 items-center py-3 ${i < arr.length - 1 ? "border-r border-gray-100" : ""}`}>
-              <Text className="text-[17px] font-semibold text-gray-900">{v}</Text>
+              <Text className="text-[18px] font-bold text-gray-900">{v}</Text>
               <Text className="text-[11px] text-gray-400 mt-0.5">{l}</Text>
             </View>
           ))}
@@ -259,7 +259,7 @@ export default function ProfilScreen() {
         )}
 
         {/* Onglets */}
-        <View className="flex-row border-b border-gray-100 mt-4">
+        <View className="flex-row bg-white border-b border-gray-100 mt-4">
           {TABS.map(tab => (
             <TouchableOpacity
               key={tab.key}
@@ -269,7 +269,7 @@ export default function ProfilScreen() {
               <Ionicons
                 name={tab.icon as any}
                 size={15}
-                color={activeTab === tab.key ? "#1D9E75" : "#9CA3AF"}
+                color={activeTab === tab.key ? "#B85C38" : "#A08878"}
               />
               <Text className={`text-[13px] ${activeTab === tab.key ? "text-accent font-semibold" : "text-gray-400"}`}>
                 {tab.label}

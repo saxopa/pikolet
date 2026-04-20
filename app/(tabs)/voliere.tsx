@@ -31,10 +31,10 @@ export default function VoliereScreen() {
   }, [birds, query]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-50">
       <View className="px-5 pt-4 pb-2 flex-row items-end justify-between">
         <View>
-          <Text className="text-[22px] font-medium text-gray-900">Ma Volière</Text>
+          <Text className="text-[24px] font-bold text-gray-900 font-display">Ma Volière</Text>
           <Text className="text-[13px] text-gray-400">
             {loading ? "…" : `${birds.length} oiseau${birds.length !== 1 ? "x" : ""}`}
           </Text>
@@ -53,8 +53,8 @@ export default function VoliereScreen() {
             value={query}
             onChangeText={setQuery}
             placeholder="Rechercher un oiseau…"
-            className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
-            placeholderTextColor="#9CA3AF"
+            className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+            placeholderTextColor="#A08878"
           />
         </View>
       )}
@@ -75,7 +75,7 @@ export default function VoliereScreen() {
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
           columnWrapperStyle={{ gap: 10 }}
           ItemSeparatorComponent={() => <View className="h-2.5" />}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor="#1D9E75" />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor="#B85C38" />}
           ListEmptyComponent={
             <EmptyState
               icon="🪺"

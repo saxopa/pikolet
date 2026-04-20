@@ -66,52 +66,64 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
+      className="flex-1 bg-accent-light"
     >
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 48 }}
-        keyboardShouldPersistTaps="handled"
+      {/* Compact warm header */}
+      <View className="items-center px-8 pt-12 pb-6">
+        <Text style={{ fontSize: 40, marginBottom: 8 }}>🐤</Text>
+        <Text className="text-[22px] font-bold text-accent-dark font-display">Pikolèt</Text>
+        <Text className="text-sm text-accent mt-1">Rejoins la communauté</Text>
+      </View>
+
+      {/* White form card with scroll */}
+      <View
+        className="flex-1 bg-white"
+        style={{ borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
       >
-        <Text className="text-3xl font-semibold text-gray-900 mb-1">Créer un compte</Text>
-        <Text className="text-sm text-gray-400 mb-8">Rejoins la communauté Pikolèt 🐦</Text>
-
-        {fields.map((f) => (
-          <View key={f.label} className="mb-4">
-            <Text className="text-xs font-medium text-gray-600 mb-1.5">{f.label}</Text>
-            <TextInput
-              value={f.value}
-              onChangeText={f.set}
-              autoCapitalize="none"
-              keyboardType={f.keyboard ?? "default"}
-              secureTextEntry={f.secure}
-              placeholder={f.placeholder}
-              className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50"
-              placeholderTextColor="#9CA3AF"
-            />
-          </View>
-        ))}
-
-        <TouchableOpacity
-          onPress={handleRegister}
-          disabled={loading}
-          className={`rounded-xl py-3.5 items-center mt-2 mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
-          activeOpacity={0.85}
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 28, paddingBottom: 48 }}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text className="text-white font-semibold text-base">
-            {loading ? "Création du compte…" : "Créer mon compte"}
-          </Text>
-        </TouchableOpacity>
+          <Text className="text-xl font-bold text-gray-900 mb-5 font-display">Créer un compte</Text>
 
-        <TouchableOpacity
-          onPress={() => router.replace("/auth/login")}
-          className="items-center py-2"
-        >
-          <Text className="text-sm text-gray-400">
-            Déjà un compte ?{" "}
-            <Text className="text-accent font-semibold">Se connecter</Text>
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {fields.map((f) => (
+            <View key={f.label} className="mb-4">
+              <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{f.label}</Text>
+              <TextInput
+                value={f.value}
+                onChangeText={f.set}
+                autoCapitalize="none"
+                keyboardType={f.keyboard ?? "default"}
+                secureTextEntry={f.secure}
+                placeholder={f.placeholder}
+                className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50"
+                placeholderTextColor="#A08878"
+              />
+            </View>
+          ))}
+
+          <TouchableOpacity
+            onPress={handleRegister}
+            disabled={loading}
+            className={`rounded-xl py-3.5 items-center mt-2 mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
+            activeOpacity={0.85}
+          >
+            <Text className="text-white font-bold text-base">
+              {loading ? "Création du compte…" : "Créer mon compte"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.replace("/auth/login")}
+            className="items-center py-2"
+          >
+            <Text className="text-sm text-gray-400">
+              Déjà un compte ?{" "}
+              <Text className="text-accent font-bold">Se connecter</Text>
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 }

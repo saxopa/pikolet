@@ -30,9 +30,18 @@ export function SongCard({ song, onDelete }: Props) {
   }
 
   return (
-    <View className="bg-white border border-gray-100 rounded-2xl mb-2.5 overflow-hidden">
+    <View
+      className="bg-white rounded-2xl mb-2.5 overflow-hidden"
+      style={{
+        shadowColor: "#1C1209",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.07,
+        shadowRadius: 8,
+        elevation: 2,
+      }}
+    >
       <View className="px-3.5 pt-3 pb-1 flex-row items-start gap-3">
-        <View className="w-12 h-12 rounded-xl bg-accent-light items-center justify-center">
+        <View className="w-12 h-12 rounded-xl bg-forest-light items-center justify-center">
           <Text className="text-2xl">🎵</Text>
         </View>
         <View className="flex-1">
@@ -41,7 +50,7 @@ export function SongCard({ song, onDelete }: Props) {
             {song.bird?.species === "pikolet" ? "Pikolèt" : "Lorti"} · {song.bird?.name}
           </Text>
           {song.owner?.username && (
-            <Text className="text-[11px] text-accent mt-0.5">Partagé par {song.owner.username}</Text>
+            <Text className="text-[11px] text-forest mt-0.5">Partagé par {song.owner.username}</Text>
           )}
         </View>
         <View className="flex-row items-center gap-2">
@@ -52,7 +61,7 @@ export function SongCard({ song, onDelete }: Props) {
           )}
           {onDelete && (
             <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
-              <Ionicons name="trash-outline" size={16} color="#D1D5DB" />
+              <Ionicons name="trash-outline" size={16} color="#C8B49E" />
             </TouchableOpacity>
           )}
         </View>

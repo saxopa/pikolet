@@ -47,7 +47,16 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
   }
 
   return (
-    <View className="bg-white border border-gray-100 rounded-2xl mb-3 overflow-hidden">
+    <View
+      className="bg-white rounded-2xl mb-3 overflow-hidden"
+      style={{
+        shadowColor: "#1C1209",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.07,
+        shadowRadius: 8,
+        elevation: 2,
+      }}
+    >
       <View className="flex-row items-center gap-2.5 px-3.5 pt-3 pb-2">
         <TouchableOpacity onPress={() => router.push(`/profile/${post.author.username}`)}>
           <Avatar uri={post.author.avatar_url} name={post.author.display_name ?? post.author.username} size={36} />
@@ -69,7 +78,7 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
         )}
         {isOwn && onDelete && (
           <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
-            <Ionicons name="trash-outline" size={16} color="#9CA3AF" />
+            <Ionicons name="trash-outline" size={16} color="#C8B49E" />
           </TouchableOpacity>
         )}
       </View>
@@ -105,13 +114,13 @@ export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
 
       <View className="flex-row gap-4 px-3.5 py-2.5 border-t border-gray-50">
         <TouchableOpacity onPress={onLike} className="flex-row items-center gap-1.5">
-          <Ionicons name={liked ? "heart" : "heart-outline"} size={18} color={liked ? "#EF4444" : "#9CA3AF"} />
+          <Ionicons name={liked ? "heart" : "heart-outline"} size={18} color={liked ? "#EF4444" : "#A08878"} />
           <Text className={`text-xs ${liked ? "text-red-400" : "text-gray-400"}`}>
             {likeCount > 0 ? likeCount : "J'aime"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onComment} className="flex-row items-center gap-1.5">
-          <Ionicons name={commentCount > 0 ? "chatbubble" : "chatbubble-outline"} size={16} color={commentCount > 0 ? "#1D9E75" : "#9CA3AF"} />
+          <Ionicons name={commentCount > 0 ? "chatbubble" : "chatbubble-outline"} size={16} color={commentCount > 0 ? "#B85C38" : "#A08878"} />
           <Text className={`text-xs ${commentCount > 0 ? "text-accent" : "text-gray-400"}`}>
             {commentCount > 0 ? commentCount : "Commenter"}
           </Text>

@@ -23,7 +23,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     ]).start(() => setMessage(null));
   }, [opacity]);
 
-  const bg = type === "error" ? "#EF4444" : type === "info" ? "#3B82F6" : "#1D9E75";
+  const bg = type === "error" ? "#EF4444" : type === "info" ? "#3B82F6" : "#B85C38";
 
   return (
     <ToastContext.Provider value={{ toast }}>

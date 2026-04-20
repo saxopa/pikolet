@@ -37,13 +37,23 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
+      className="flex-1 bg-accent-light"
     >
-      <View className="flex-1 px-6 justify-center">
-        <Text className="text-3xl font-semibold text-gray-900 mb-1">Connexion</Text>
-        <Text className="text-sm text-gray-400 mb-8">Communauté éleveurs Guyane 🐦</Text>
+      {/* Warm header */}
+      <View className="items-center px-8 pt-16 pb-10">
+        <Text style={{ fontSize: 52, marginBottom: 10 }}>🐤</Text>
+        <Text className="text-[30px] font-bold text-accent-dark font-display">Pikolèt</Text>
+        <Text className="text-sm text-accent mt-2 font-medium">Communauté éleveurs</Text>
+      </View>
 
-        <Text className="text-xs font-medium text-gray-600 mb-1.5">Email</Text>
+      {/* White form card */}
+      <View
+        className="flex-1 bg-white px-6 pt-8"
+        style={{ borderTopLeftRadius: 28, borderTopRightRadius: 28 }}
+      >
+        <Text className="text-xl font-bold text-gray-900 mb-6 font-display">Connexion</Text>
+
+        <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Email</Text>
         <TextInput
           value={email}
           onChangeText={setEmail}
@@ -52,10 +62,10 @@ export default function LoginScreen() {
           placeholder="ton@email.com"
           returnKeyType="next"
           className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-4"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A08878"
         />
 
-        <Text className="text-xs font-medium text-gray-600 mb-1.5">Mot de passe</Text>
+        <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Mot de passe</Text>
         <TextInput
           value={password}
           onChangeText={setPassword}
@@ -64,7 +74,7 @@ export default function LoginScreen() {
           returnKeyType="done"
           onSubmitEditing={handleLogin}
           className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 bg-gray-50 mb-6"
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A08878"
         />
 
         <TouchableOpacity
@@ -73,7 +83,7 @@ export default function LoginScreen() {
           className={`rounded-xl py-3.5 items-center mb-4 ${loading ? "bg-accent/60" : "bg-accent"}`}
           activeOpacity={0.85}
         >
-          <Text className="text-white font-semibold text-base">
+          <Text className="text-white font-bold text-base">
             {loading ? "Connexion…" : "Se connecter"}
           </Text>
         </TouchableOpacity>
@@ -84,7 +94,7 @@ export default function LoginScreen() {
         >
           <Text className="text-sm text-gray-400">
             Pas encore de compte ?{" "}
-            <Text className="text-accent font-semibold">Créer un compte</Text>
+            <Text className="text-accent font-bold">Créer un compte</Text>
           </Text>
         </TouchableOpacity>
       </View>

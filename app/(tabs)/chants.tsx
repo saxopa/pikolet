@@ -37,10 +37,10 @@ export default function ChantsScreen() {
   }, [songs, query]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-50">
       <View className="px-5 pt-4 pb-2 flex-row items-end justify-between">
         <View>
-          <Text className="text-[22px] font-medium text-gray-900">Bibliothèque</Text>
+          <Text className="text-[24px] font-bold text-gray-900 font-display">Bibliothèque</Text>
           <Text className="text-[13px] text-gray-400">Chants partagés</Text>
         </View>
         {user && (
@@ -58,19 +58,19 @@ export default function ChantsScreen() {
           value={query}
           onChangeText={setQuery}
           placeholder="Rechercher un chant…"
-          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
-          placeholderTextColor="#9CA3AF"
+          className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900"
+          placeholderTextColor="#A08878"
         />
       </View>
 
-      <View className="flex-row border-b border-gray-100">
+      <View className="flex-row bg-white border-b border-gray-100">
         {TABS.map(tab => (
           <TouchableOpacity
             key={tab.key}
             onPress={() => setFilter(tab.key as never)}
-            className={`flex-1 py-2 items-center border-b-2 ${filter === tab.key ? "border-accent" : "border-transparent"}`}
+            className={`flex-1 py-2.5 items-center border-b-2 ${filter === tab.key ? "border-accent" : "border-transparent"}`}
           >
-            <Text className={`text-[13px] ${filter === tab.key ? "text-accent font-medium" : "text-gray-500"}`}>
+            <Text className={`text-[13px] ${filter === tab.key ? "text-accent font-semibold" : "text-gray-500"}`}>
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -86,7 +86,7 @@ export default function ChantsScreen() {
           data={filtered}
           keyExtractor={s => s.id}
           contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} tintColor="#1D9E75" />}
+          refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} tintColor="#B85C38" />}
           ListEmptyComponent={
             <EmptyState
               icon="🎵"
