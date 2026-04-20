@@ -7,7 +7,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
-import { getListing, updateListingStatus, deleteListing } from "../../lib/supabase";
+import { getListing, updateListingStatus, deleteListing, getOrCreateConversation } from "../../lib/supabase";
 import type { Enums } from "../../types/database";
 import type { Listing } from "../../types";
 
@@ -76,9 +76,13 @@ export default function ListingDetailScreen() {
     ]);
   }
 
-  function contactSeller() {
-    if (!listing?.seller?.username) return;
-    router.push(`/profile/${listing.seller.username}`);
+  async function contactSeller() {
+    if (!user || !listing?.seller_id) return;
+    if (user.id === listing.seller_id) return;
+    const { id: convId, error } = await getOrCreateConversation(user.id, listing.seller_id);
+    if (error || !convId) { toast("Impossible d'ouvrir la conversation", "error"); return; }
+    const display = listing.seller?.display_name ?? listing.seller?.username ?? "";
+    router.push(`/conversation/${convId}?username=${listing.seller.username}&display=${display}`);
   }
 
   if (loading) {

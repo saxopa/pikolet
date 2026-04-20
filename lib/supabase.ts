@@ -257,6 +257,83 @@ export const getBirdCompetitions = (birdId: string) =>
 export const deleteCompetition = (compId: string) =>
   supabase.from("competitions").delete().eq("id", compId);
 
+// ─── Messagerie ─────────────────────────────────────────────────────────────
+
+export const getOrCreateConversation = async (userId: string, otherId: string) => {
+  const [p1, p2] = [userId, otherId].sort();
+  const { data: existing } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("participant_1", p1)
+    .eq("participant_2", p2)
+    .single();
+  if (existing) return { id: existing.id, error: null };
+  const { data, error } = await supabase
+    .from("conversations")
+    .insert({ participant_1: p1, participant_2: p2 })
+    .select("id")
+    .single();
+  return { id: data?.id ?? null, error };
+};
+
+export const getConversations = (userId: string) =>
+  supabase
+    .from("conversations")
+    .select(`
+      *,
+      p1:profiles!conversations_participant_1_fkey(id, username, display_name, avatar_url),
+      p2:profiles!conversations_participant_2_fkey(id, username, display_name, avatar_url)
+    `)
+    .or(`participant_1.eq.${userId},participant_2.eq.${userId}`)
+    .order("last_message_at", { ascending: false });
+
+export const getMessages = (conversationId: string) =>
+  supabase
+    .from("messages")
+    .select("*")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true })
+    .limit(100);
+
+export const sendMessage = async (conversationId: string, senderId: string, content: string) => {
+  const { data, error } = await supabase
+    .from("messages")
+    .insert({ conversation_id: conversationId, sender_id: senderId, content })
+    .select()
+    .single();
+  if (!error) {
+    await supabase
+      .from("conversations")
+      .update({ last_message_preview: content.slice(0, 80), last_message_at: new Date().toISOString() })
+      .eq("id", conversationId);
+  }
+  return { data, error };
+};
+
+export const markMessagesRead = (conversationId: string, userId: string) =>
+  supabase
+    .from("messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", userId)
+    .is("read_at", null);
+
+export const getUnreadCount = async (userId: string) => {
+  const { data: convs } = await supabase
+    .from("conversations")
+    .select("id")
+    .or(`participant_1.eq.${userId},participant_2.eq.${userId}`);
+  if (!convs?.length) return { count: 0 };
+  const ids = convs.map(c => c.id);
+  const { count } = await supabase
+    .from("messages")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null)
+    .neq("sender_id", userId)
+    .in("conversation_id", ids);
+  return { count: count ?? 0 };
+};
+
 // ─── Marketplace ────────────────────────────────────────────────────────────
 
 export const getListings = (category?: string) => {

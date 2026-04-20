@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   getProfileByUsername, getProfilePosts, getPublicBirds, getMySongs,
-  getFollowStatus, sendFollowRequest, unfollowUser, deletePost,
+  getFollowStatus, sendFollowRequest, unfollowUser, deletePost, getOrCreateConversation,
 } from "../../lib/supabase";
 import { useAuth } from "../../hooks/useAuth";
 import { useProfileStats } from "../../hooks/useProfileStats";
@@ -110,6 +110,14 @@ export default function PublicProfileScreen() {
     setPosts(prev => prev.filter(p => p.id !== postId));
   }
 
+  async function handleMessage() {
+    if (!user || !profile) return;
+    const { id: convId, error } = await getOrCreateConversation(user.id, profile.id);
+    if (error || !convId) return;
+    const display = profile.display_name ?? profile.username;
+    router.push(`/conversation/${convId}?username=${profile.username}&display=${display}`);
+  }
+
   const isSelf = user?.id === profile?.id;
 
   const followLabel = followStatus === "accepted" ? "Abonné" : followStatus === "pending" ? "Demande envoyée" : "Suivre";
@@ -202,14 +210,24 @@ export default function PublicProfileScreen() {
             )}
 
             {!isSelf && user && (
-              <TouchableOpacity
-                onPress={handleFollow}
-                className={`mt-4 flex-row items-center gap-1.5 px-6 py-2.5 rounded-full border ${followStyle}`}
-                activeOpacity={0.8}
-              >
-                <Ionicons name={followIcon as any} size={14} color={followIconColor} />
-                <Text className={`text-sm font-semibold ${followTextStyle}`}>{followLabel}</Text>
-              </TouchableOpacity>
+              <View className="flex-row gap-2 mt-4">
+                <TouchableOpacity
+                  onPress={handleFollow}
+                  className={`flex-row items-center gap-1.5 px-5 py-2.5 rounded-full border ${followStyle}`}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name={followIcon as any} size={14} color={followIconColor} />
+                  <Text className={`text-sm font-semibold ${followTextStyle}`}>{followLabel}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleMessage}
+                  className="flex-row items-center gap-1.5 px-5 py-2.5 rounded-full border border-gray-200 bg-gray-50"
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="chatbubble-outline" size={14} color="#7A6456" />
+                  <Text className="text-sm font-semibold text-gray-600">Message</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         )}
