@@ -31,6 +31,7 @@ export default function NewSongScreen() {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [audioFile, setAudioFile] = useState<{ uri: string; name: string; mimeType: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [birdsLoading, setBirdsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -39,6 +40,7 @@ export default function NewSongScreen() {
         setBirds(data as unknown as Bird[]);
         if (data.length > 0) setSelectedBird(data[0].id);
       }
+      setBirdsLoading(false);
     });
   }, [user]);
 
@@ -101,6 +103,27 @@ export default function NewSongScreen() {
       toast("Chant ajouté ✓");
       router.back();
     }
+  }
+
+  if (!birdsLoading && birds.length === 0) {
+    return (
+      <View className="flex-1 bg-gray-50 items-center justify-center px-8">
+        <Text className="text-6xl mb-4">🪺</Text>
+        <Text className="text-lg font-bold text-gray-900 mb-2 font-display">Aucun oiseau</Text>
+        <Text className="text-sm text-gray-500 text-center mb-8">
+          Tu dois d'abord créer un oiseau avant de pouvoir lui ajouter un chant.
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.replace("/bird/new")}
+          className="bg-accent rounded-xl px-8 py-3.5 w-full items-center"
+        >
+          <Text className="text-white font-semibold">Créer mon premier oiseau</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} className="mt-4 py-2">
+          <Text className="text-sm text-gray-400">Retour</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   return (
