@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, Alert, Platform, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer } from "../audio/AudioPlayer";
-import { useOfflineSongs } from "../../hooks/useOfflineSongs";
 import type { SongWithMeta } from "../../hooks/useChants";
 
 const SONG_TYPE_LABEL: Record<string, string> = {
@@ -19,20 +18,6 @@ type Props = {
 
 export function SongCard({ song, onDelete }: Props) {
   const router = useRouter();
-  const { download, remove, getLocalUri, isDownloaded, isDownloading } = useOfflineSongs();
-  const localUri = getLocalUri(song.id);
-  const downloaded = isDownloaded(song.id);
-  const downloading = isDownloading(song.id);
-  const canDownload = !!song.storage_url && !song.youtube_url;
-
-  function handleWebDownload() {
-    const a = document.createElement("a");
-    a.href = song.storage_url!;
-    a.download = song.title + ".mp3";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
 
   function confirmDelete() {
     if (Platform.OS === "web") {
@@ -79,26 +64,6 @@ export function SongCard({ song, onDelete }: Props) {
               <Text className="text-white text-[9px] font-bold">YT</Text>
             </View>
           )}
-          {canDownload && (
-            Platform.OS === "web" ? (
-              <TouchableOpacity onPress={handleWebDownload} hitSlop={8}>
-                <Ionicons name="arrow-down-circle-outline" size={18} color="#C8B49E" />
-              </TouchableOpacity>
-            ) : downloading ? (
-              <ActivityIndicator size={14} color="#C8B49E" />
-            ) : (
-              <TouchableOpacity
-                onPress={() => downloaded ? remove(song.id) : download(song.id, song.storage_url!)}
-                hitSlop={8}
-              >
-                <Ionicons
-                  name={downloaded ? "checkmark-circle" : "arrow-down-circle-outline"}
-                  size={18}
-                  color={downloaded ? "#1E7A4F" : "#C8B49E"}
-                />
-              </TouchableOpacity>
-            )
-          )}
           {onDelete && (
             <TouchableOpacity onPress={confirmDelete} hitSlop={8}>
               <Ionicons name="trash-outline" size={16} color="#C8B49E" />
@@ -113,7 +78,6 @@ export function SongCard({ song, onDelete }: Props) {
           youtubeUrl={song.youtube_url}
           duration={song.duration_seconds}
           title={song.title}
-          localUri={localUri}
         />
       </View>
 
