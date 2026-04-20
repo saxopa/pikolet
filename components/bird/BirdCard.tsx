@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Badge } from "../ui/Badge";
+import { SPECIES_EMOJI, SPECIES_LABEL } from "../../constants/species";
 import type { Bird } from "../../types";
 
 const STATUS_VARIANT = {
@@ -15,8 +16,6 @@ const STATUS_LABEL = {
   reproduction: "Reproduction",
   entrainement: "Entraînement",
 };
-
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
 
 type Props = { bird: Bird; onPress: () => void };
 
@@ -48,7 +47,7 @@ export function BirdCard({ bird, onPress }: Props) {
       <View className="p-3 pt-2.5">
         <Text className="text-sm font-semibold text-gray-900">{bird.name}</Text>
         <Text className="text-[11px] text-gray-500 mb-2">
-          {bird.species === "pikolet" ? "Pikolèt" : "Lorti"} · {bird.gender === "male" ? "Mâle" : "Femelle"}
+          {SPECIES_LABEL[bird.species] ?? bird.species} · {bird.gender === "male" ? "Mâle" : "Femelle"}
         </Text>
         <Badge label={STATUS_LABEL[bird.status]} variant={STATUS_VARIANT[bird.status]} />
         {bird.ring_code && (

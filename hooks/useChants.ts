@@ -9,7 +9,7 @@ export type SongWithMeta = BirdSong & {
 
 export function useChants() {
   const [songs, setSongs] = useState<SongWithMeta[]>([]);
-  const [filter, setFilter] = useState<BirdSpecies | "all">("all");
+  const [filter, setFilter] = useState<BirdSpecies | "all" | "favoris">("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -24,9 +24,9 @@ export function useChants() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = filter === "all"
+  const filtered = filter === "all" || filter === "favoris"
     ? songs
     : songs.filter(s => s.bird?.species === filter);
 
-  return { songs: filtered, filter, setFilter, loading, error, refresh: load };
+  return { songs: filtered, allSongs: songs, filter, setFilter, loading, error, refresh: load };
 }

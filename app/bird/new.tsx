@@ -9,6 +9,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
 import { createBird, updateBird, uploadBirdImage } from "../../lib/supabase";
+import { SPECIES_EMOJI, SPECIES_OPTIONS } from "../../constants/species";
 import type { BirdSpecies, BirdGender, BirdStatus } from "../../types";
 
 function Picker<T extends string>({ label, options, value, onChange }: { label: string; options: { key: T; label: string }[]; value: T; onChange: (v: T) => void }) {
@@ -29,8 +30,6 @@ function Picker<T extends string>({ label, options, value, onChange }: { label: 
     </View>
   );
 }
-
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
 
 export default function NewBirdScreen() {
   const { user } = useAuth();
@@ -113,7 +112,7 @@ export default function NewBirdScreen() {
           <TextInput value={name} onChangeText={setName} placeholder="Ex: Prodige" className="border border-gray-200 rounded-xl px-4 py-3 text-sm" placeholderTextColor="#A08878" />
         </View>
 
-        <Picker label="Espèce *" value={species} onChange={setSpecies} options={[{ key: "pikolet", label: "🐤 Pikolèt" }, { key: "lorti", label: "🦜 Lorti" }]} />
+        <Picker label="Espèce *" value={species} onChange={setSpecies} options={SPECIES_OPTIONS.map(s => ({ key: s.key as BirdSpecies, label: s.label }))} />
         <Picker label="Sexe *" value={gender} onChange={setGender} options={[{ key: "male", label: "Mâle" }, { key: "femelle", label: "Femelle" }]} />
         <Picker label="Statut" value={status} onChange={setStatus} options={[
           { key: "en_forme", label: "En forme" }, { key: "mue", label: "Mue" },

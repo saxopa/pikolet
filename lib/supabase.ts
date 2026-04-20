@@ -242,6 +242,16 @@ export const getFollowers = (userId: string) =>
 export const getFollowing = (userId: string) =>
   supabase.from("follows").select("following:profiles!following_id(*)").eq("follower_id", userId).eq("status", "accepted");
 
+// ─── Favoris chants ─────────────────────────────────────────────────────────
+
+export const getSongFavorites = (userId: string) =>
+  supabase.from("song_favorites").select("song_id").eq("user_id", userId);
+
+export const toggleSongFavorite = (userId: string, songId: string, isFavorited: boolean) =>
+  isFavorited
+    ? supabase.from("song_favorites").delete().match({ user_id: userId, song_id: songId })
+    : supabase.from("song_favorites").insert({ user_id: userId, song_id: songId });
+
 // ─── Suppression ────────────────────────────────────────────────────────────
 
 export const deletePost = (postId: string) =>

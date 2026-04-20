@@ -9,6 +9,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
 import { createListing, uploadPostImage, getMyBirds } from "../../lib/supabase";
+import { SPECIES_EMOJI } from "../../constants/species";
 import type { Bird, ListingCategory, ListingPriceType } from "../../types";
 
 const CATEGORIES: { key: ListingCategory; label: string; emoji: string }[] = [
@@ -23,8 +24,6 @@ const PRICE_TYPES: { key: ListingPriceType; label: string }[] = [
   { key: "negotiable", label: "À négocier" },
   { key: "free", label: "Gratuit" },
 ];
-
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
 
 export default function NewListingScreen() {
   const { user } = useAuth();

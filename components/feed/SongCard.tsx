@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Alert, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer } from "../audio/AudioPlayer";
+import { SPECIES_LABEL } from "../../constants/species";
 import type { SongWithMeta } from "../../hooks/useChants";
 
 const SONG_TYPE_LABEL: Record<string, string> = {
@@ -14,9 +15,11 @@ const SONG_TYPE_LABEL: Record<string, string> = {
 type Props = {
   song: SongWithMeta;
   onDelete?: (songId: string) => void;
+  isFavorited?: boolean;
+  onToggleFavorite?: (songId: string) => void;
 };
 
-export function SongCard({ song, onDelete }: Props) {
+export function SongCard({ song, onDelete, isFavorited, onToggleFavorite }: Props) {
   const router = useRouter();
 
   function confirmDelete() {
@@ -31,6 +34,8 @@ export function SongCard({ song, onDelete }: Props) {
       { text: "Supprimer", style: "destructive", onPress: () => onDelete?.(song.id) },
     ]);
   }
+
+  const speciesLabel = SPECIES_LABEL[song.bird?.species] ?? song.bird?.species ?? "Oiseau";
 
   return (
     <View
@@ -50,7 +55,7 @@ export function SongCard({ song, onDelete }: Props) {
         <View className="flex-1">
           <Text className="text-sm font-semibold text-gray-900" numberOfLines={1}>{song.title}</Text>
           <Text className="text-[11px] text-gray-500 mt-0.5">
-            {song.bird?.species === "pikolet" ? "Pikolèt" : "Lorti"} · {song.bird?.name}
+            {speciesLabel} · {song.bird?.name}
           </Text>
           {song.owner?.username && (
             <TouchableOpacity onPress={() => router.push(`/profile/${song.owner.username}`)}>
@@ -63,6 +68,15 @@ export function SongCard({ song, onDelete }: Props) {
             <View className="bg-red-500 px-1.5 py-0.5 rounded">
               <Text className="text-white text-[9px] font-bold">YT</Text>
             </View>
+          )}
+          {onToggleFavorite && (
+            <TouchableOpacity onPress={() => onToggleFavorite(song.id)} hitSlop={8} accessibilityLabel={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}>
+              <Ionicons
+                name={isFavorited ? "heart" : "heart-outline"}
+                size={18}
+                color={isFavorited ? "#B85C38" : "#C8B49E"}
+              />
+            </TouchableOpacity>
           )}
           {onDelete && (
             <TouchableOpacity onPress={confirmDelete} hitSlop={8}>

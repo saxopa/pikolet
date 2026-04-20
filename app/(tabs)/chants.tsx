@@ -4,6 +4,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useChants } from "../../hooks/useChants";
 import { useAuth } from "../../hooks/useAuth";
+import { useSongFavorites } from "../../hooks/useSongFavorites";
 import { SongCard } from "../../components/feed/SongCard";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { SkeletonPostCard } from "../../components/ui/SkeletonPostCard";
@@ -12,11 +13,15 @@ const TABS = [
   { key: "all", label: "Tous" },
   { key: "pikolet", label: "🐤 Pikolèt" },
   { key: "lorti", label: "🦜 Lorti" },
+  { key: "djek", label: "🐦 Djek" },
+  { key: "twa-twa", label: "🐦 Twa-twa" },
+  { key: "favoris", label: "⭐ Favoris" },
 ] as const;
 
 export default function ChantsScreen() {
-  const { songs, filter, setFilter, loading, error, refresh } = useChants();
+  const { songs, allSongs, filter, setFilter, loading, error, refresh } = useChants();
   const { user } = useAuth();
+  const { favorites, toggle: toggleFavorite } = useSongFavorites(user?.id);
   const router = useRouter();
   const [query, setQuery] = useState("");
   const isMounted = useRef(false);
@@ -27,14 +32,17 @@ export default function ChantsScreen() {
   }, [refresh]));
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return songs;
+    const base = filter === "favoris"
+      ? allSongs.filter(s => favorites.has(s.id))
+      : songs;
+    if (!query.trim()) return base;
     const q = query.toLowerCase();
-    return songs.filter(s =>
+    return base.filter(s =>
       s.title.toLowerCase().includes(q) ||
       (s.bird as any)?.name?.toLowerCase().includes(q) ||
       (s.owner as any)?.username?.toLowerCase().includes(q)
     );
-  }, [songs, query]);
+  }, [songs, allSongs, query, filter, favorites]);
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -104,7 +112,13 @@ export default function ChantsScreen() {
               subtitle={query ? "Essaie un autre terme" : "Sois le premier à partager un enregistrement"}
             />
           }
-          renderItem={({ item }) => <SongCard song={item} />}
+          renderItem={({ item }) => (
+            <SongCard
+              song={item}
+              isFavorited={favorites.has(item.id)}
+              onToggleFavorite={user ? toggleFavorite : undefined}
+            />
+          )}
         />
       )}
     </View>

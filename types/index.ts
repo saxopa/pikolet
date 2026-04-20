@@ -9,7 +9,7 @@ export interface Profile {
   created_at: string;
 }
 
-export type BirdSpecies = "pikolet" | "lorti";
+export type BirdSpecies = "pikolet" | "lorti" | "djek" | "twa-twa";
 export type BirdGender = "male" | "femelle";
 export type BirdStatus = "en_forme" | "mue" | "reproduction" | "entrainement";
 

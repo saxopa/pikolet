@@ -6,6 +6,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
 import { getMyBirds, addSong, uploadBirdSong } from "../../lib/supabase";
+import { SPECIES_EMOJI } from "../../constants/species";
 import type { Bird, SongType } from "../../types";
 
 const SONG_TYPES: { key: SongType; label: string }[] = [
@@ -14,8 +15,6 @@ const SONG_TYPES: { key: SongType; label: string }[] = [
   { key: "femelle", label: "Femelle" },
   { key: "stimulation", label: "Stimulation" },
 ];
-
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
 
 type SourceMode = "youtube" | "file";
 
