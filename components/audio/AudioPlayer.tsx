@@ -92,7 +92,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
   const isShort = !!youtubeUrl?.includes("/shorts/");
   const playUri = localUri ?? url;
   const hasAudio = isYt || !!playUri;
-  
+
   const isPlayingHere = globalState.currentTrack?.id === playUri && globalState.isPlaying;
   const progressHere = globalState.currentTrack?.id === playUri ? globalState.progress : 0;
 
@@ -147,7 +147,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
 
         {isYt ? (
           <Text className="flex-1 text-xs text-gray-600" numberOfLines={1}>
-            {ytExpanded ? "Tap ▶ pour fermer" : (title ?? "Écouter sur YouTube")}
+            {ytExpanded ? "cliquer sur ▶ pour fermer" : (title ?? "Écouter sur YouTube")}
           </Text>
         ) : (
           <View className="flex-1">
