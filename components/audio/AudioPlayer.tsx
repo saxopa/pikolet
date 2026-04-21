@@ -147,7 +147,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
 
         {isYt ? (
           <Text className="flex-1 text-xs text-gray-600" numberOfLines={1}>
-            {ytExpanded ? "cliquer sur ▶ pour fermer" : (title ?? "Écouter sur YouTube")}
+            {title ?? "Écouter sur YouTube"}
           </Text>
         ) : (
           <View className="flex-1">
