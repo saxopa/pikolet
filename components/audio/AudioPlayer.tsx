@@ -1,9 +1,10 @@
 import { View, Text, TouchableOpacity, Modal, Platform } from "react-native";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Waveform } from "./Waveform";
 import { useAuth } from "../../hooks/useAuth";
+import { useGlobalAudio } from "../../context/GlobalAudioContext";
 
 type Props = {
   url?: string | null;
@@ -81,20 +82,16 @@ function GuestModal({ visible, onClose }: { visible: boolean; onClose: () => voi
 }
 
 export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Props) {
-  const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [showGuestModal, setShowGuestModal] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sound = useRef<any>(null);
   const { isAuthenticated } = useAuth();
+  const { state: globalState, playTrack, pause, resume } = useGlobalAudio();
 
-  useEffect(() => () => {
-    if (Platform.OS === "web") {
-      if (sound.current) { sound.current.pause(); sound.current.src = ""; }
-    } else {
-      sound.current?.unloadAsync();
-    }
-  }, []);
+  const isYt = !!youtubeUrl;
+  const playUri = localUri ?? url;
+  const hasAudio = isYt || !!playUri;
+  
+  const isPlayingHere = globalState.currentTrack?.id === playUri && globalState.isPlaying;
+  const progressHere = globalState.currentTrack?.id === playUri ? globalState.progress : 0;
 
   async function toggle() {
     if (!isAuthenticated) {
@@ -108,45 +105,19 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
       return;
     }
 
-    const playUri = localUri ?? url;
     if (!playUri) return;
 
-    if (Platform.OS === "web") {
-      if (!sound.current) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const audio = new (window as any).Audio(playUri) as HTMLAudioElement;
-        audio.addEventListener("ended", () => { setPlaying(false); setProgress(0); });
-        audio.addEventListener("timeupdate", () => {
-          if (audio.duration) setProgress(audio.currentTime / audio.duration);
-        });
-        sound.current = audio;
-      }
-      if (playing) {
-        sound.current.pause();
-        setPlaying(false);
+    if (globalState.currentTrack?.id === playUri) {
+      if (globalState.isPlaying) {
+        pause();
       } else {
-        await sound.current.play();
-        setPlaying(true);
+        resume();
       }
-      return;
+    } else {
+      playTrack({ id: playUri, url: playUri, title: title || "Chant d'oiseau" });
     }
-
-    if (!sound.current) {
-      const { Audio } = await import("expo-av");
-      const { sound: s } = await Audio.Sound.createAsync({ uri: playUri }, {}, (status) => {
-        if (status.isLoaded && status.durationMillis) {
-          setProgress(status.positionMillis / status.durationMillis);
-          if (status.didJustFinish) { setPlaying(false); setProgress(0); }
-        }
-      });
-      sound.current = s;
-    }
-    if (playing) { await sound.current?.pauseAsync(); setPlaying(false); }
-    else { await sound.current?.playAsync(); setPlaying(true); }
   }
 
-  const isYt = !!youtubeUrl;
-  const hasAudio = isYt || !!url || !!localUri;
   if (!hasAudio) return null;
 
   return (
@@ -155,7 +126,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
       <View className="bg-gray-50 rounded-xl px-3 py-2.5 flex-row items-center gap-2.5 mb-2">
         <TouchableOpacity
           onPress={toggle}
-          className="w-8 h-8 rounded-full bg-accent items-center justify-center"
+          className="w-8 h-8 rounded-full bg-accent items-center justify-center bg-[#B85C38]"
           activeOpacity={0.8}
         >
           {!isAuthenticated ? (
@@ -163,7 +134,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
           ) : isYt ? (
             <Ionicons name="logo-youtube" size={14} color="white" />
           ) : (
-            <Ionicons name={playing ? "pause" : "play"} size={14} color="white" style={{ marginLeft: playing ? 0 : 2 }} />
+            <Ionicons name={isPlayingHere ? "pause" : "play"} size={14} color="white" style={{ marginLeft: isPlayingHere ? 0 : 2 }} />
           )}
         </TouchableOpacity>
 
@@ -173,9 +144,9 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
           </Text>
         ) : (
           <View className="flex-1">
-            <Waveform progress={isAuthenticated ? progress : 0} />
+            <Waveform progress={isAuthenticated ? progressHere : 0} />
             {!isAuthenticated && (
-              <Text className="text-[10px] text-accent/70 mt-0.5">
+              <Text className="text-[10px] text-[#B85C38]/70 mt-0.5">
                 Connecte-toi pour écouter
               </Text>
             )}

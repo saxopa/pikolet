@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AuthProvider } from "../context/AuthContext";
 import { ToastProvider } from "../context/ToastContext";
+import { GlobalAudioProvider } from "../context/GlobalAudioContext";
+import { FloatingAudioPlayer } from "../components/audio/FloatingAudioPlayer";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -45,7 +47,10 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <NavigationStack />
+        <GlobalAudioProvider>
+          <NavigationStack />
+          <FloatingAudioPlayer />
+        </GlobalAudioProvider>
       </ToastProvider>
     </AuthProvider>
   );
