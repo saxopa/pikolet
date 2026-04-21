@@ -165,6 +165,16 @@ export const addSong = (song: Omit<BirdSong, "id" | "created_at" | "play_count">
 export const getProfileByUsername = (username: string) =>
   supabase.from("profiles").select("*").eq("username", username).single();
 
+export const searchProfiles = (query: string, currentUserId: string, limit = 20) =>
+  supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url, bio, location")
+    .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .eq("is_public", true)
+    .neq("id", currentUserId)
+    .order("username", { ascending: true })
+    .limit(limit);
+
 export const getProfilePosts = (userId: string) =>
   supabase
     .from("posts")

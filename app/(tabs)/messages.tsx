@@ -1,6 +1,7 @@
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { useCallback, useRef } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../hooks/useAuth";
 import { useConversations } from "../../hooks/useConversations";
 import { ConversationItem } from "../../components/messages/ConversationItem";
@@ -55,10 +56,20 @@ export default function MessagesScreen() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <View className="px-5 pt-4 pb-3">
-        <Text className="text-[24px] font-bold text-gray-900 font-display">Messages</Text>
-        <Text className="text-[13px] text-gray-400">{conversations.length} conversation{conversations.length !== 1 ? "s" : ""}</Text>
+      <View className="flex-row items-center justify-between px-5 pt-4 pb-3">
+        <View>
+          <Text className="text-[24px] font-bold text-gray-900 font-display">Messages</Text>
+          <Text className="text-[13px] text-gray-400">{conversations.length} conversation{conversations.length !== 1 ? "s" : ""}</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push("/search")}
+          className="w-10 h-10 items-center justify-center rounded-full bg-accent/10"
+          activeOpacity={0.8}
+        >
+          <Ionicons name="person-add-outline" size={20} color="#B85C38" />
+        </TouchableOpacity>
       </View>
+
 
       {loading ? (
         <View className="gap-px">
