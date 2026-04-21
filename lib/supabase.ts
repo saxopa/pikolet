@@ -36,7 +36,7 @@ export const signUpWithEmail = (
 export const signInWithGoogle = () =>
   supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: "https://saxopa.github.io/pikolet" },
+    options: { redirectTo: "https://saxopa.github.io/pikolet/auth/confirm" },
   });
 
 export const signOut = () => supabase.auth.signOut();
