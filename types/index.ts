@@ -47,6 +47,7 @@ export interface BirdSong {
   is_public: boolean;
   recorded_at: string | null;
   created_at: string;
+  youtube_author: string | null;
 }
 
 export type LogType = "entrainement" | "concours" | "alimentation" | "sante" | "note";

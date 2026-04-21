@@ -57,11 +57,15 @@ export function SongCard({ song, onDelete, isFavorited, onToggleFavorite }: Prop
           <Text className="text-[11px] text-gray-500 mt-0.5">
             {speciesLabel} · {song.bird?.name}
           </Text>
-          {song.owner?.username && (
+          {song.youtube_author ? (
+            <Text className="text-[11px] text-gray-400 mt-0.5">
+              📺 {song.youtube_author}
+            </Text>
+          ) : song.owner?.username ? (
             <TouchableOpacity onPress={() => router.push(`/profile/${song.owner.username}`)}>
               <Text className="text-[11px] text-forest mt-0.5">Partagé par {song.owner.username}</Text>
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
         <View className="flex-row items-center gap-2">
           {song.source_type === "youtube" && (
