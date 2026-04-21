@@ -123,7 +123,7 @@ export default function LoginScreen() {
           />
 
           <Text className="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Mot de passe</Text>
-          <View style={{ position: "relative", marginBottom: 24 }}>
+          <View style={{ position: "relative", marginBottom: 8 }}>
             <TextInput
               value={password}
               onChangeText={setPassword}
@@ -151,6 +151,14 @@ export default function LoginScreen() {
               />
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            onPress={() => router.push("/auth/forgot-password")}
+            className="items-end mb-5"
+            accessibilityRole="button"
+          >
+            <Text className="text-xs text-accent font-semibold">Mot de passe oublié ?</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleLogin}

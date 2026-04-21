@@ -89,10 +89,10 @@ export default function ConfirmScreen() {
               router.replace("/(tabs)/feed");
             }
           }
-          if (event === "PASSWORD_RECOVERY" || event === "USER_UPDATED") {
+          if (event === "PASSWORD_RECOVERY") {
             clearTimeout(timeout);
             listener.subscription.unsubscribe();
-            router.replace("/(tabs)/feed");
+            router.replace("/auth/reset-password");
           }
         });
 
