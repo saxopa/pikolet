@@ -55,6 +55,14 @@ export default function ConfirmScreen() {
           });
           return;
         }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase.from("profiles").select("username").eq("id", user.id).single();
+          if (!profile?.username) {
+            router.replace("/auth/setup-username");
+            return;
+          }
+        }
         router.replace("/(tabs)/feed");
         return;
       }
@@ -70,11 +78,16 @@ export default function ConfirmScreen() {
           });
         }, 8000);
 
-        const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === "SIGNED_IN" && session) {
             clearTimeout(timeout);
             listener.subscription.unsubscribe();
-            router.replace("/(tabs)/feed");
+            const { data: profile } = await supabase.from("profiles").select("username").eq("id", session.user.id).single();
+            if (!profile?.username) {
+              router.replace("/auth/setup-username");
+            } else {
+              router.replace("/(tabs)/feed");
+            }
           }
           if (event === "PASSWORD_RECOVERY" || event === "USER_UPDATED") {
             clearTimeout(timeout);
