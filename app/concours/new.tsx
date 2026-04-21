@@ -1,12 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { useState, useEffect } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { useAuth } from "../../hooks/useAuth";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useToast } from "../../context/ToastContext";
-import { getMyBirds, createCompetition } from "../../lib/supabase";
+import { useAuth } from "../../hooks/useAuth";
+import { createCompetition, getMyBirds } from "../../lib/supabase";
 import type { Bird } from "../../types";
 
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐦", lorti: "🐦" };
 const RANK_OPTIONS = [
   { label: "1er", value: 1 },
   { label: "2ème", value: 2 },

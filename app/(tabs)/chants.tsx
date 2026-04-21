@@ -1,18 +1,18 @@
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, TextInput } from "react-native";
-import { useState, useMemo, useCallback, useRef } from "react";
-import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useChants } from "../../hooks/useChants";
-import { useAuth } from "../../hooks/useAuth";
-import { useSongFavorites } from "../../hooks/useSongFavorites";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { FlatList, RefreshControl, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SongCard } from "../../components/feed/SongCard";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { SkeletonPostCard } from "../../components/ui/SkeletonPostCard";
+import { useAuth } from "../../hooks/useAuth";
+import { useChants } from "../../hooks/useChants";
+import { useSongFavorites } from "../../hooks/useSongFavorites";
 
 const TABS = [
   { key: "all", label: "Tous" },
-  { key: "pikolet", label: "🐤 Pikolèt" },
-  { key: "lorti", label: "🦜 Lorti" },
+  { key: "pikolet", label: "🐦 Pikolèt" },
+  { key: "lorti", label: "🐦 Lorti" },
   { key: "djek", label: "🐦 Djek" },
   { key: "twa-twa", label: "🐦 Twa-twa" },
   { key: "favoris", label: "⭐ Favoris" },

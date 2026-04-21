@@ -1,17 +1,17 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert, Platform } from "react-native";
-import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
-import { useCallback, useRef } from "react";
 import * as DocumentPicker from "expo-document-picker";
-import { useBirdDetail } from "../../hooks/useVoliere";
-import { Badge } from "../../components/ui/Badge";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useRef } from "react";
+import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AudioPlayer } from "../../components/audio/AudioPlayer";
-import { deleteBird, deleteSong, updateBird, uploadBirdImage, deleteCompetition } from "../../lib/supabase";
+import { Badge } from "../../components/ui/Badge";
 import { useToast } from "../../context/ToastContext";
+import { useBirdDetail } from "../../hooks/useVoliere";
+import { deleteBird, deleteCompetition, deleteSong, updateBird, uploadBirdImage } from "../../lib/supabase";
 
 const STATUS_VARIANT = { en_forme: "green", mue: "amber", reproduction: "blue", entrainement: "green" } as const;
 const STATUS_LABEL = { en_forme: "En forme", mue: "Mue en cours", reproduction: "Reproduction", entrainement: "Entraînement" };
 const LOG_ICON: Record<string, string> = { entrainement: "🎵", concours: "🏆", alimentation: "🍃", sante: "💊", note: "📝" };
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐦", lorti: "🐦" };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (

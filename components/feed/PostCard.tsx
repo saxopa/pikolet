@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, Alert, Platform, Image } from "react-native";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Avatar } from "../ui/Avatar";
-import { AudioPlayer } from "../audio/AudioPlayer";
+import { useRouter } from "expo-router";
+import { Alert, Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import type { FeedPost } from "../../hooks/useFeed";
+import { AudioPlayer } from "../audio/AudioPlayer";
+import { Avatar } from "../ui/Avatar";
 
 type Props = {
   post: FeedPost;
@@ -22,7 +22,7 @@ function timeAgo(date: string) {
   return new Date(date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
-const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐤", lorti: "🦜" };
+const SPECIES_EMOJI: Record<string, string> = { pikolet: "🐦", lorti: "🐦" };
 const SPECIES_LABEL: Record<string, string> = { pikolet: "Pikolèt", lorti: "Lorti" };
 
 export function PostCard({ post, userId, onLike, onComment, onDelete }: Props) {
