@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Waveform } from "./Waveform";
+import { YoutubeEmbed } from "./YoutubeEmbed";
 import { useAuth } from "../../hooks/useAuth";
 import { useGlobalAudio } from "../../context/GlobalAudioContext";
 
@@ -83,10 +84,12 @@ function GuestModal({ visible, onClose }: { visible: boolean; onClose: () => voi
 
 export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Props) {
   const [showGuestModal, setShowGuestModal] = useState(false);
+  const [ytExpanded, setYtExpanded] = useState(false);
   const { isAuthenticated } = useAuth();
   const { state: globalState, playTrack, pause, resume } = useGlobalAudio();
 
   const isYt = !!youtubeUrl;
+  const isShort = !!youtubeUrl?.includes("/shorts/");
   const playUri = localUri ?? url;
   const hasAudio = isYt || !!playUri;
   
@@ -100,8 +103,12 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
     }
 
     if (youtubeUrl) {
-      const { Linking } = await import("react-native");
-      Linking.openURL(youtubeUrl);
+      if (Platform.OS === "web") {
+        setYtExpanded(v => !v);
+      } else {
+        const { Linking } = await import("react-native");
+        Linking.openURL(youtubeUrl);
+      }
       return;
     }
 
@@ -140,7 +147,7 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
 
         {isYt ? (
           <Text className="flex-1 text-xs text-gray-600" numberOfLines={1}>
-            {title ?? "Écouter sur YouTube"}
+            {ytExpanded ? "Tap ▶ pour fermer" : (title ?? "Écouter sur YouTube")}
           </Text>
         ) : (
           <View className="flex-1">
@@ -157,6 +164,10 @@ export function AudioPlayer({ url, youtubeUrl, duration, title, localUri }: Prop
           <Text className="text-[11px] text-gray-400">{formatDuration(duration)}</Text>
         )}
       </View>
+
+      {isYt && ytExpanded && youtubeUrl && (
+        <YoutubeEmbed url={youtubeUrl} isShort={isShort} />
+      )}
     </>
   );
 }
