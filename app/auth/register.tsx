@@ -1,12 +1,16 @@
-import {
-  View, Text, TextInput, TouchableOpacity,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Modal,
-} from "react-native";
-import { useState } from "react";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { signUpWithEmail, signInWithGoogle } from "../../lib/supabase";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform, ScrollView,
+  Text, TextInput, TouchableOpacity,
+  View,
+} from "react-native";
 import { useToast } from "../../context/ToastContext";
+import { signInWithGoogle, signUpWithEmail } from "../../lib/supabase";
 
 type FieldErrors = {
   username?: string;
@@ -168,7 +172,7 @@ export default function RegisterScreen() {
       </Modal>
 
       <View className="items-center px-8 pt-12 pb-6">
-        <Text style={{ fontSize: 40, marginBottom: 8 }}>🐤</Text>
+        <Text style={{ fontSize: 40, marginBottom: 8 }}>🐦</Text>
         <Text className="text-[22px] font-bold text-accent-dark font-display">Pikolèt</Text>
         <Text className="text-sm text-accent mt-1">Rejoins la communauté</Text>
       </View>

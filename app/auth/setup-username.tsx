@@ -1,10 +1,10 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useState, useEffect } from "react";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { supabase, upsertProfile } from "../../lib/supabase";
-import { useAuth } from "../../hooks/useAuth";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../hooks/useAuth";
+import { supabase, upsertProfile } from "../../lib/supabase";
 
 export default function SetupUsernameScreen() {
   const [username, setUsername] = useState("");
@@ -48,7 +48,7 @@ export default function SetupUsernameScreen() {
 
   return (
     <View className="flex-1 bg-accent-light items-center justify-center px-8">
-      <Text style={{ fontSize: 52, marginBottom: 12 }}>🐤</Text>
+      <Text style={{ fontSize: 52, marginBottom: 12 }}>🐦</Text>
       <Text className="text-[22px] font-bold text-accent-dark font-display mb-2 text-center">
         Choisis ton pseudo
       </Text>
