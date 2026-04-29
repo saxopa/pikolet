@@ -1,3 +1,4 @@
+import * as WebBrowser from "expo-web-browser";
 import { createClient } from "@supabase/supabase-js";
 import type { Database, Enums } from "../types/database";
 import type { Post, Bird, BirdSong, Profile, BirdLog, Competition } from "../types";
@@ -33,11 +34,20 @@ export const signUpWithEmail = (
     },
   });
 
-export const signInWithGoogle = () =>
-  supabase.auth.signInWithOAuth({
+export const signInWithGoogle = async () => {
+  const redirectTo = "pikolet://auth/confirm";
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: "https://saxopa.github.io/pikolet/auth/confirm" },
+    options: { redirectTo, skipBrowserRedirect: true },
   });
+  if (error || !data.url) return { error: error ?? new Error("No OAuth URL") };
+
+  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+  if (result.type === "success" && result.url) {
+    await supabase.auth.exchangeCodeForSession(result.url);
+  }
+  return { error: null };
+};
 
 export const signOut = () => supabase.auth.signOut();
 

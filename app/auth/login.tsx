@@ -1,12 +1,16 @@
-import {
-  View, Text, TextInput, TouchableOpacity,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Modal,
-} from "react-native";
-import { useState } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { signInWithEmail, signInWithGoogle } from "../../lib/supabase";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform, ScrollView,
+  Text, TextInput, TouchableOpacity,
+  View,
+} from "react-native";
 import { useToast } from "../../context/ToastContext";
+import { signInWithEmail, signInWithGoogle, supabase } from "../../lib/supabase";
 
 const ERROR_MAP: Record<string, string> = {
   "Invalid login credentials": "Email ou mot de passe incorrect.",
@@ -25,8 +29,15 @@ export default function LoginScreen() {
   const confirmError = params.confirm_error;
 
   async function handleGoogle() {
+    setLoading(true);
     const { error } = await signInWithGoogle();
-    if (error) toast("Connexion Google impossible.", "error");
+    setLoading(false);
+    if (error) {
+      toast("Connexion Google impossible.", "error");
+      return;
+    }
+    const { data } = await supabase.auth.getSession();
+    if (data?.session) router.replace("/(tabs)/feed");
   }
 
   async function handleLogin() {
@@ -84,7 +95,7 @@ export default function LoginScreen() {
       >
         {/* Header */}
         <View className="items-center px-8 pt-16 pb-10">
-          <Text style={{ fontSize: 52, marginBottom: 10 }}>🐤</Text>
+          <Text style={{ fontSize: 52, marginBottom: 10 }}>🐦</Text>
           <Text className="text-[30px] font-bold text-accent-dark font-display">Pikolèt</Text>
           <Text className="text-sm text-accent mt-2 font-medium">Communauté éleveurs</Text>
         </View>
